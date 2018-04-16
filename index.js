@@ -1,5 +1,5 @@
 
-var five = require("johnny-five");
+var five = require('johnny-five');
 var board = new five.Board();
 const axios = require('axios');
 
