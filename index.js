@@ -23,15 +23,15 @@ board.on("ready", function() {
 
 
 function sendData () {
-    if (initialized) {
+   // if (initialized) {
         console.log(sensorData)
         axios.post(apiUri, sensorData)
         .then((res)=> {
         })
         .catch(console.log)
-    } else {
-        console.log('initializing')
-    }
+    //} else {
+   //     console.log('initializing')
+   // }
 }
 
 
