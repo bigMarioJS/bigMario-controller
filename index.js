@@ -1,40 +1,51 @@
+import five from 'johnny-five';
+import axios from 'axios';
+import config from './config';
+import SensorData from './sensorData';
 
-var five = require('johnny-five');
-var board = new five.Board();
-const axios = require('axios');
+let initialized = false;
+let sensorData = new SensorData();
 
-const apiUri = 'http://10.0.1.14:3000/api/datahook'
+const initBoard = () => {
+  let board = new five.Board();
 
-let initialized;
-let sensorData = {}
+  board.on("ready", function() {
+    initialized = true;
 
-board.on("ready", function() {
- initialized = true
+    var sensor = new five.Multi({
+      controller: "HTU21D"
+    });
 
-  const thermometer = new five.Thermometer({
-    controller: "DS18B20",
-    pin: 2
+    sensor.on("change", function() {
+      sensorData.setData({
+        relativeHumidityOne: this.hygrometer.relativeHumidity,
+        tempatureCelsiusOne: this.thermometer.celsius
+      })
+    })
   });
-
-  thermometer.on("change", function() {
-    sensorData.temp = this.celsius
-  });
-});
-
-
-function sendData () {
-   // if (initialized) {
-        console.log(sensorData)
-        axios.post(apiUri, sensorData)
-        .then((res)=> {
-        })
-        .catch(console.log)
-    //} else {
-   //     console.log('initializing')
-   // }
 }
 
+const sendData = () => {
+  let data = Object.assign(
+    {},
+    sensorData.getData(),
+    {initialized},
+    {environmentId: config.environmentId}
+  )
 
+  console.log(data)
 
-setInterval(sendData, 1500);
+  axios.post(config.uri, data, {headers: { 'x-api-key': config.apiKey}})
+    .catch((error) => console.log("Error contacting endpoint"))
+    .finally(()=>{
+     sensorData.clearData();
+    });
+  }
 
+const loop = () => {
+  sendData();
+  setTimeout(loop, config.updateSeconds);
+}
+
+initBoard();
+loop();
