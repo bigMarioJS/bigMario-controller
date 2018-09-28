@@ -9,7 +9,7 @@
     "babel-node": "./node_modules/@babel/node/bin/babel-node.js",
     "build": "./node_modules/.bin/babel src --out-dir lib",
     "prebuild": "rm -rf build/*",
-    "start": "NODE_ENV=production npm run babel-node -- ./src/index.js",
+    "start": "npm run babel-node -- ./src/index.js",
     "prestart": "npm build"
   },
   "author": "",
