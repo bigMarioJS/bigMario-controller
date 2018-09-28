@@ -2,9 +2,16 @@ import five from 'johnny-five';
 import axios from 'axios';
 import config from './config';
 import SensorData from './sensorData';
+import express from 'express';
+
+const app = express()
 
 let initialized = false;
 let sensorData = new SensorData();
+
+app.get('/sensorData', (req, res) => res.send(sensorData.getLastReading()))
+app.get('/initialized', (req, res) => res.send({initialized}))
+app.listen(config.port, () => console.log(`Example app listening on port ${config.port}!`))
 
 const initBoard = () => {
   let board = new five.Board();

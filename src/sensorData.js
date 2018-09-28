@@ -1,6 +1,7 @@
 export default class SensorData {
   constructor() {
     this.data = {};
+    this.lastReading = {};
   }
 
   getData () {
@@ -8,7 +9,12 @@ export default class SensorData {
   }
 
   setData (data) {
+    this.lastReading = this.data;
     this.data = data;
+  }
+
+  getLastReading () {
+    return this.lastReading;
   }
 
   clearData () {
