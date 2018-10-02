@@ -32,7 +32,7 @@
     "express": "^4.16.3",
     "johnny-five": "1.0.0",
     "moment": "^2.22.2",
-    "tuyapi": "github:codetheweb/tuyapi"
+    "tuyapi": "^3.0.2"
   },
   "devDependencies": {}
 }
