@@ -36,7 +36,6 @@ const growProfile = {
   temp: 23
 }
 
-
 app.get('/sensorData', (req, res) => res.send(sensorData.getLastReading()))
 app.get('/initialized', (req, res) => res.send({initialized}))
 app.listen(config.port, () => console.log(`Example app listening on port ${config.port}!`))
@@ -79,7 +78,6 @@ const sendDataLoop = () => {
     });
   }
 
-
   const humditiyLoop = async () => {
     let humditiy = sensorData.data.relativeHumidityOne
 
@@ -101,7 +99,4 @@ const sendDataLoop = () => {
   initBoard();
   setInterval(sendDataLoop, config.updateSeconds)
   setInterval(humditiyLoop, 10000)
-
-// humditiyLoop()
-// sendDataLoop()
 
