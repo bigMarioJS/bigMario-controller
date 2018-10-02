@@ -1,16 +1,17 @@
 export default class SensorData {
   constructor() {
-    this.data = {};
+    this.sensorData = {};
     this.lastReading = {};
   }
 
-  getData () {
-    return this.data;
+  get data () {
+    return this.sensorData;
   }
 
   setData (data) {
-    this.lastReading = this.data;
-    this.data = data;
+    this.lastReading = this.sensorData;
+    this.sensorData = data;
+    this.sensorData.recordedAt = new Date();
   }
 
   getLastReading () {
@@ -18,6 +19,6 @@ export default class SensorData {
   }
 
   clearData () {
-    this.data = {};
+    this.sensorData = {};
   }
 }

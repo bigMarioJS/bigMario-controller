@@ -1,13 +1,41 @@
+// require("b").transform("code", options);
+
 import five from 'johnny-five';
 import axios from 'axios';
 import config from './config';
 import SensorData from './sensorData';
 import express from 'express';
+import WifiOutLets from './WifiOutLets';
+import { outletNames } from './const';
+import Logger from './Logger'
 
-const app = express()
+const logger = new Logger();
+
+logger.info("Starting app")
+const app = express();
 
 let initialized = false;
 let sensorData = new SensorData();
+
+let outlets = new WifiOutLets(config)
+outlets.allOff().then().catch()
+
+const growProfile = {
+  relativeHumidity: {
+    high: 90,
+    low: 80
+  },
+  freshAirExchange: {
+    runTimeSeconds: 60,
+    times: [
+      '0 0 * * *',
+      '0 8 * * *',
+      '0 16 * * *'
+    ]
+  },
+  temp: 23
+}
+
 
 app.get('/sensorData', (req, res) => res.send(sensorData.getLastReading()))
 app.get('/initialized', (req, res) => res.send({initialized}))
@@ -32,27 +60,48 @@ const initBoard = () => {
   });
 }
 
-const sendData = () => {
+const sendDataLoop = () => {
+
   let data = Object.assign(
     {},
-    sensorData.getData(),
+    sensorData.data,
     {initialized},
     {environmentId: config.environmentId}
   )
 
-  console.log(data)
+  logger.info(`Sending Data: ${JSON.stringify(data)}`)
 
   axios.post(config.uri, data, {headers: { 'x-api-key': config.apiKey}})
     .catch((error) => console.log("Error contacting endpoint"))
     .finally(()=>{
      sensorData.clearData();
+
     });
   }
 
-const loop = () => {
-  sendData();
-  setTimeout(loop, config.updateSeconds);
-}
 
-initBoard();
-loop();
+  const humditiyLoop = async () => {
+    let humditiy = sensorData.data.relativeHumidityOne
+
+    if (humditiy < growProfile.relativeHumidity.low) {
+      logger.info(`Humidity at ${humditiy} below threashold of ${growProfile.relativeHumidity.low}`);
+      let humidifierStatus = await outlets.turn(outletNames.humidifier, true);
+      let humidifierFanStatus = await outlets.turn(outletNames.humidifierFan, true);
+    }
+
+    if (humditiy > growProfile.relativeHumidity.high) {
+      logger.info(`Humidity at ${humditiy} above threashold of ${growProfile.relativeHumidity.high}`);
+      let humidifierStatus = await outlets.turn(outletNames.humidifier, false);
+      let humidifierFanStatus = await outlets.turn(outletNames.humidifierFan, false);
+    }
+
+
+  }
+
+  initBoard();
+  setInterval(sendDataLoop, config.updateSeconds)
+  setInterval(humditiyLoop, 10000)
+
+// humditiyLoop()
+// sendDataLoop()
+

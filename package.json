@@ -16,22 +16,23 @@
   "license": "ISC",
   "dependencies": {
     "@babel/core": "^7.0.0",
+    "@babel/node": "^7.0.0",
     "@babel/plugin-proposal-decorators": "^7.0.0",
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
+    "@babel/plugin-transform-async-to-generator": "^7.1.0",
     "@babel/plugin-transform-destructuring": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
+    "@babel/preset-es2017": "^7.0.0-beta.53",
     "@babel/preset-stage-0": "^7.0.0",
     "axios": "^0.18.0",
     "babel-jest": "^23.4.2",
     "body-parser": "^1.18.3",
+    "bunyan": "^1.8.12",
     "cron-parser": "^2.5.0",
     "express": "^4.16.3",
     "johnny-five": "1.0.0",
-    "@babel/node": "^7.0.0",
-    "@babel/plugin-transform-async-to-generator": "^7.1.0",
-    "@babel/preset-es2017": "^7.0.0-beta.53"
+    "moment": "^2.22.2",
+    "tuyapi": "github:codetheweb/tuyapi"
   },
-  "devDependencies": {
-
-  }
+  "devDependencies": {}
 }
