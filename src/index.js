@@ -49,6 +49,63 @@ const initBoard = () => {
   });
   console.log('New Board')
 
+
+
+  board.on("info", function(event) {
+    /*
+      Event {
+        type: "info"|"warn"|"fail",
+        timestamp: Time of event in milliseconds,
+        class: name of relevant component class,
+        message: message [+ ...detail]
+      }
+    */
+    console.log("%s sent an 'info' message: %s", event.class, event.message);
+  });
+
+  board.on("warn", function(event) {
+    /*
+      Event {
+        type: "info"|"warn"|"fail",
+        timestamp: Time of event in milliseconds,
+        class: name of relevant component class,
+        message: message [+ ...detail]
+      }
+    */
+    console.log("%s sent a 'warn' message: %s", event.class, event.message);
+  });
+
+  board.on("fail", function(event) {
+    /*
+      Event {
+        type: "info"|"warn"|"fail",
+        timestamp: Time of event in milliseconds,
+        class: name of relevant component class,
+        message: message [+ ...detail]
+      }
+    */
+    console.log("%s sent a 'fail' message: %s", event.class, event.message);
+  });
+
+  board.on("message", function(event) {
+    /*
+      Event {
+        type: "info"|"warn"|"fail",
+        timestamp: Time of event in milliseconds,
+        class: name of relevant component class,
+        message: message [+ ...detail]
+      }
+    */
+    console.log("Received a %s message, from %s, reporting: %s", event.type, event.class, event.message);
+  });
+
+
+
+
+
+
+
+
   board.on("ready", function() {
     console.log('Board REady')
     initialized = true;
