@@ -43,7 +43,10 @@ app.get('/initialized', (req, res) => res.send({initialized}))
 app.listen(config.port, () => console.log(`Example app listening on port ${config.port}!`))
 
 const initBoard = () => {
-  let board = new five.Board();
+  let board = new five.Board({
+    repl: false,
+    debug: false,
+  });
   console.log('New Board')
 
   board.on("ready", function() {
