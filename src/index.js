@@ -1,5 +1,3 @@
-// require("b").transform("code", options);
-
 import "@babel/polyfill";
 
 import five from 'johnny-five';
@@ -40,74 +38,15 @@ const growProfile = {
 
 app.get('/sensorData', (req, res) => res.send(sensorData.getLastReading()))
 app.get('/initialized', (req, res) => res.send({initialized}))
-app.listen(config.port, () => console.log(`Example app listening on port ${config.port}!`))
+app.listen(config.statusPort.port, () => console.log(`MyceliumJS listening on port ${config.statusPort.port}!`))
 
 const initBoard = () => {
   let board = new five.Board({
     repl: false,
     debug: false,
   });
-  console.log('New Board')
-
-
-
-  board.on("info", function(event) {
-    /*
-      Event {
-        type: "info"|"warn"|"fail",
-        timestamp: Time of event in milliseconds,
-        class: name of relevant component class,
-        message: message [+ ...detail]
-      }
-    */
-    console.log("%s sent an 'info' message: %s", event.class, event.message);
-  });
-
-  board.on("warn", function(event) {
-    /*
-      Event {
-        type: "info"|"warn"|"fail",
-        timestamp: Time of event in milliseconds,
-        class: name of relevant component class,
-        message: message [+ ...detail]
-      }
-    */
-    console.log("%s sent a 'warn' message: %s", event.class, event.message);
-  });
-
-  board.on("fail", function(event) {
-    /*
-      Event {
-        type: "info"|"warn"|"fail",
-        timestamp: Time of event in milliseconds,
-        class: name of relevant component class,
-        message: message [+ ...detail]
-      }
-    */
-    console.log("%s sent a 'fail' message: %s", event.class, event.message);
-  });
-
-  board.on("message", function(event) {
-    /*
-      Event {
-        type: "info"|"warn"|"fail",
-        timestamp: Time of event in milliseconds,
-        class: name of relevant component class,
-        message: message [+ ...detail]
-      }
-    */
-    console.log("Received a %s message, from %s, reporting: %s", event.type, event.class, event.message);
-  });
-
-
-
-
-
-
-
 
   board.on("ready", function() {
-    console.log('Board REady')
     initialized = true;
 
     var sensor = new five.Multi({
@@ -129,16 +68,15 @@ const sendDataLoop = () => {
     {},
     sensorData.data,
     {initialized},
-    {environmentId: config.environmentId}
+    {environmentId: config.growEnvironmentId}
   )
 
   logger.info(`Sending Data: ${JSON.stringify(data)}`)
 
-  axios.post(config.uri, data, {headers: { 'x-api-key': config.apiKey}})
+  axios.post(config.myceliumApiUri, data, {headers: { 'x-api-key': config.myceliumApiSecret}})
     .catch((error) => console.log("Error contacting endpoint"))
     .finally(()=>{
      sensorData.clearData();
-
     });
   }
 
@@ -156,11 +94,9 @@ const sendDataLoop = () => {
       let humidifierStatus = await outlets.turn(outletNames.humidifier, false);
       let humidifierFanStatus = await outlets.turn(outletNames.humidifierFan, false);
     }
-
-
   }
 
   initBoard();
-  setInterval(sendDataLoop, config.updateSeconds)
-  setInterval(humditiyLoop, 10000)
+  setInterval(sendDataLoop, config.myceliumApiUpdateSeconds)
+  setInterval(humditiyLoop, config.myceliumHumidityUpdateSeconds)
 
