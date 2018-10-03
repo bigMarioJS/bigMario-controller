@@ -7,15 +7,15 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:dev": "nodemon --exec npm run babel-node -- ./src/index.js",
     "babel-node": "./node_modules/@babel/node/bin/babel-node.js",
-    "build": "./node_modules/.bin/babel src --out-dir lib",
+    "build": "./node_modules/@babel/cli/bin/babel.js src --out-dir build",
     "prebuild": "rm -rf build/*",
-    "start": "npm run babel-node -- ./src/index.js",
-    "prestart": "npm build"
+    "start": "node ./build/index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@babel/core": "^7.0.0",
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
     "@babel/node": "^7.0.0",
     "@babel/plugin-proposal-decorators": "^7.0.0",
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
@@ -34,5 +34,7 @@
     "moment": "^2.22.2",
     "tuyapi": "^3.0.2"
   },
-  "devDependencies": {}
+  "devDependencies": {
+
+  }
 }
