@@ -42,8 +42,10 @@ app.listen(config.port, () => console.log(`Example app listening on port ${confi
 
 const initBoard = () => {
   let board = new five.Board();
+  console.log('New Board')
 
   board.on("ready", function() {
+    console.log('Board REady')
     initialized = true;
 
     var sensor = new five.Multi({
