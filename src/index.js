@@ -1,5 +1,7 @@
 // require("b").transform("code", options);
 
+import "@babel/polyfill";
+
 import five from 'johnny-five';
 import axios from 'axios';
 import config from './config';
