@@ -40,6 +40,13 @@ export default class WifiOutLets {
     this.updateState();
   }
 
+  get status() {
+    let results = {};
+    Object.keys(this.state).forEach(key => {
+      results[key] = this.state[key].state
+    })
+    return results;
+  }
 
   makeReverseOutLetMap () {
     let map = {};
@@ -68,7 +75,7 @@ export default class WifiOutLets {
     }
   }
 
-  async allOff() {
+  async allOff () {
     let results;
     logger.info(`Turning ALL OFF`)
     try {
@@ -79,7 +86,7 @@ export default class WifiOutLets {
     return results;
   }
 
-  async turn(id, state) {
+  async turn (id, state) {
     let results;
 
     if (this.state[id].state !== state && !this.state[id].requestingChange) {

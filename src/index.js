@@ -38,7 +38,7 @@ const growProfile = {
 
 app.get('/sensorData', (req, res) => res.send(sensorData.getLastReading()))
 app.get('/initialized', (req, res) => res.send({initialized}))
-app.listen(config.statusPort.port, () => console.log(`MyceliumJS listening on port ${config.statusPort.port}!`))
+app.listen(config.statusPort.port, () => console.log(`MyceliumJS listening on port ${config.statusPort}!`))
 
 const initBoard = () => {
   let board = new five.Board({
@@ -67,6 +67,7 @@ const sendDataLoop = () => {
   let data = Object.assign(
     {},
     sensorData.data,
+    {outletStatus: outlets.status},
     {initialized},
     {environmentId: config.growEnvironmentId}
   )
