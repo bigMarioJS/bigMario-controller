@@ -9,8 +9,8 @@ export default class WifiOutLets {
 
     // TODO: move to config
     this.outletMap = {
-      [outletNames.humidifier]: 1,
-      [outletNames.exhaustFan]: 2,
+      [outletNames.humidifier]: 2,
+      [outletNames.exhaustFan]: 1,
       [outletNames.humidifierFan]: 3,
       [outletNames.heater]: 4,
       [outletNames.all]: 6
@@ -71,7 +71,7 @@ export default class WifiOutLets {
       logger.info(`Updated state: ${JSON.stringify(newState)}`)
       this.state = newState;
     } catch (e) {
-      logger.error()
+      logger.error(e)
     }
   }
 
@@ -87,6 +87,8 @@ export default class WifiOutLets {
   }
 
   async turn (id, state) {
+    console.log('turn', id, state)
+    console.log('turn states', this.state)
     let results;
 
     if (this.state[id].state !== state && !this.state[id].requestingChange) {

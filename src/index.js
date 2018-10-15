@@ -7,34 +7,30 @@ import SensorData from './sensorData';
 import express from 'express';
 import WifiOutLets from './WifiOutLets';
 import { outletNames } from './const';
-import Logger from './Logger'
+import Logger from './Logger';
+// import schedule from 'node-schedule';
+import growProfile from './growProfile'
+import HeatLoop from "./heatLoop";
 
 const logger = new Logger();
 
-logger.info("Starting app")
-const app = express();
 
 let initialized = false;
 let sensorData = new SensorData();
+console.log('index', sensorData)
 
 let outlets = new WifiOutLets(config)
 outlets.allOff().then().catch()
 
-const growProfile = {
-  relativeHumidity: {
-    high: 90,
-    low: 80
-  },
-  freshAirExchange: {
-    runTimeSeconds: 60,
-    times: [
-      '0 0 * * *',
-      '0 8 * * *',
-      '0 16 * * *'
-    ]
-  },
-  temp: 23
-}
+
+const heatLoop = new HeatLoop(sensorData, growProfile, outlets)
+
+
+
+
+logger.info("Starting app")
+
+const app = express();
 
 app.get('/sensorData', (req, res) => res.send(sensorData.getLastReading()))
 app.get('/initialized', (req, res) => res.send({initialized}))
@@ -81,8 +77,9 @@ const sendDataLoop = () => {
     });
   }
 
+
   const humditiyLoop = async () => {
-    let humditiy = sensorData.data.relativeHumidityOne
+    let humditiy = sensorData.getData().relativeHumidityOne
 
     if (humditiy < growProfile.relativeHumidity.low) {
       logger.info(`Humidity at ${humditiy} below threashold of ${growProfile.relativeHumidity.low}`);
@@ -97,7 +94,22 @@ const sendDataLoop = () => {
     }
   }
 
+  const freshAirExchange = (seconds) => {
+    let time = seconds * 1000;
+    outlets.turn(outletNames.freshAirExchange, true)
+    setTimeout(outlets.turn, time, outletNames.freshAirExchange, false)
+  }
+
+  // const initSchedules = (schedules, fn) => {
+  //   schedules.forEach(schedule => {
+  //     schedule.scheduleJob(schedule.time, fn(schedule.seconds))
+  //   });
+  // }
+
   initBoard();
-  setInterval(sendDataLoop, config.myceliumApiUpdateSeconds)
-  setInterval(humditiyLoop, config.myceliumHumidityUpdateSeconds)
+  setInterval(heatLoop.doLoop, config.myceliumApiUpdateSeconds)
+  //initSchedules(growProfile.freshAirExchange.schedules, freshAirExchange);
+  setInterval(sendDataLoop, config.myceliumApiUpdateSeconds);
+
+  setInterval(humditiyLoop, config.myceliumHumidityUpdateSeconds);
 
