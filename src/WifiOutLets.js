@@ -9,8 +9,8 @@ export default class WifiOutLets {
 
     // TODO: move to config
     this.outletMap = {
-      [outletNames.humidifier]: 1,
-      [outletNames.exhaustFan]: 2,
+      [outletNames.humidifier]: 2,
+      [outletNames.exhaustFan]: 1,
       [outletNames.humidifierFan]: 3,
       [outletNames.heater]: 4,
       [outletNames.all]: 6
