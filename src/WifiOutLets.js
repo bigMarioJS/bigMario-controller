@@ -27,6 +27,8 @@ export default class WifiOutLets {
     this.state = this.initState;
     this.reverseOutletMap = this.makeReverseOutLetMap();
 
+    this.getStatus = this.getStatus.bind(this);
+
     try {
       this.tuya = new TuyaDevice({
         id: config.tuyaLocalId,
@@ -87,8 +89,6 @@ export default class WifiOutLets {
   }
 
   async turn (id, state) {
-    // console.log('turn', id, state)
-    // console.log('turn states', this.state)
     let results;
 
     if (this.state[id].state !== state && !this.state[id].requestingChange) {

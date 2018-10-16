@@ -72,10 +72,10 @@ const sendDataLoop = () => {
     {environmentId: config.growEnvironmentId}
   )
 
-  // logger.info(`Sending Data: ${JSON.stringify(data)}`)
+  logger.info(`Sending Data: ${JSON.stringify(data, null, 2)}`)
 
   axios.post(config.myceliumApiUri, data, {headers: { 'x-api-key': config.myceliumApiSecret}})
-    .catch((error) => console.log("Error contacting endpoint"))
+    .catch((error) => console.log("Error contacting endpoint", error))
     .finally(()=>{
      sensorData.clearData();
     });
