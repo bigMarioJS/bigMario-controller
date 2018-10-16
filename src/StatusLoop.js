@@ -5,7 +5,7 @@ import Logger from './Logger';
 const logger = new Logger();
 const timeout = ms => new Promise(res => setTimeout(res, ms))
 
-export default class HeatLoop {
+export default class StatusLoop {
   constructor(sensorData, growProfile, outlets) {
     this.sensorData = sensorData;
     this.growProfile = growProfile;

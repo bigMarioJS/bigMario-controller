@@ -10,7 +10,7 @@ import { outletNames } from './const';
 import Logger from './Logger';
 // import schedule from 'node-schedule';
 import growProfile from './growProfile'
-import HeatLoop from './HeatLoop';
+import HeatLoop from './heatLoop';
 import StatusLoop from './StatusLoop';
 import HumidityLoop from './HumidityLoop'
 
