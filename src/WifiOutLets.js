@@ -40,7 +40,7 @@ export default class WifiOutLets {
     this.updateState();
   }
 
-  get status() {
+  getStatus() {
     let results = {};
     Object.keys(this.state).forEach(key => {
       results[key] = this.state[key].state
@@ -87,17 +87,18 @@ export default class WifiOutLets {
   }
 
   async turn (id, state) {
-    console.log('turn', id, state)
-    console.log('turn states', this.state)
+    // console.log('turn', id, state)
+    // console.log('turn states', this.state)
     let results;
 
     if (this.state[id].state !== state && !this.state[id].requestingChange) {
       logger.info(`Turning ${id} ${state ? 'ON' : 'OFF'}`)
 
       try {
-        results = this.tuya.set({set: state, dps: this.outletMap[id]})
         this.state[id].requestingChange = true;
-        this.state[id].state = state;
+        results = await this.tuya.set({set: state, dps: this.outletMap[id]})
+        this.state[id].state = results;
+        this.state[id].requestingChange = false;
       } catch (e) {
         console.log('cant update device', e)
       }

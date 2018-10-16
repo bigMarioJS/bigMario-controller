@@ -1,7 +1,6 @@
 export default {
   relativeHumidity: {
-    high: 90,
-    low: 80
+    target: 90
   },
   freshAirExchange: {
     schedules: [
@@ -10,5 +9,5 @@ export default {
       {time: '0 16 * * *', runTimeSeconds: 60}
     ]
   },
-  temp: 25
+  temp: 24
 }

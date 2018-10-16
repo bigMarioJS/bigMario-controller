@@ -10,22 +10,23 @@ import { outletNames } from './const';
 import Logger from './Logger';
 // import schedule from 'node-schedule';
 import growProfile from './growProfile'
-import HeatLoop from "./heatLoop";
+import HeatLoop from './HeatLoop';
+import StatusLoop from './StatusLoop';
+import HumidityLoop from './HumidityLoop'
 
 const logger = new Logger();
 
 
 let initialized = false;
 let sensorData = new SensorData();
-console.log('index', sensorData)
 
 let outlets = new WifiOutLets(config)
 outlets.allOff().then().catch()
 
 
 const heatLoop = new HeatLoop(sensorData, growProfile, outlets)
-
-
+const statusLoop = new StatusLoop(sensorData, growProfile, outlets)
+const humidityLoop = new HumidityLoop(sensorData, growProfile, outlets)
 
 
 logger.info("Starting app")
@@ -44,6 +45,7 @@ const initBoard = () => {
 
   board.on("ready", function() {
     initialized = true;
+    initLoops()
 
     var sensor = new five.Multi({
       controller: "HTU21D"
@@ -58,6 +60,8 @@ const initBoard = () => {
   });
 }
 
+
+
 const sendDataLoop = () => {
 
   let data = Object.assign(
@@ -68,7 +72,7 @@ const sendDataLoop = () => {
     {environmentId: config.growEnvironmentId}
   )
 
-  logger.info(`Sending Data: ${JSON.stringify(data)}`)
+  // logger.info(`Sending Data: ${JSON.stringify(data)}`)
 
   axios.post(config.myceliumApiUri, data, {headers: { 'x-api-key': config.myceliumApiSecret}})
     .catch((error) => console.log("Error contacting endpoint"))
@@ -87,6 +91,7 @@ const sendDataLoop = () => {
       let humidifierFanStatus = await outlets.turn(outletNames.humidifierFan, true);
     }
 
+
     if (humditiy > growProfile.relativeHumidity.high) {
       logger.info(`Humidity at ${humditiy} above threashold of ${growProfile.relativeHumidity.high}`);
       let humidifierStatus = await outlets.turn(outletNames.humidifier, false);
@@ -100,16 +105,17 @@ const sendDataLoop = () => {
     setTimeout(outlets.turn, time, outletNames.freshAirExchange, false)
   }
 
-  // const initSchedules = (schedules, fn) => {
-  //   schedules.forEach(schedule => {
-  //     schedule.scheduleJob(schedule.time, fn(schedule.seconds))
-  //   });
-  // }
+  const initLoops = () => {
+    heatLoop.init();
+    statusLoop.startLoop();
+    humidityLoop.init();
+    //setInterval(humditiyLoop, config.myceliumHumidityUpdateSeconds);
+  }
+
 
   initBoard();
-  setInterval(heatLoop.doLoop, config.myceliumApiUpdateSeconds)
+  // setTimeout(heatLoop.doLoop, 10000);
   //initSchedules(growProfile.freshAirExchange.schedules, freshAirExchange);
   setInterval(sendDataLoop, config.myceliumApiUpdateSeconds);
 
-  setInterval(humditiyLoop, config.myceliumHumidityUpdateSeconds);
 

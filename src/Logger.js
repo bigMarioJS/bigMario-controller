@@ -11,7 +11,7 @@ export default class Logger {
   }
 
   error (error) {
-    console.log(`[${moment().format('HH:MM:SS')}] ERROR ${msg}`)
+    console.log(`[${moment().format('HH:MM:SS')}] ERROR ${error}`)
   }
 
 

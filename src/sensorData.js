@@ -22,6 +22,10 @@ export default class SensorData {
     return this.lastReading.tempatureCelsiusOne;
   }
 
+  getHumidity () {
+    return this.lastReading.relativeHumidityOne;
+  }
+
   clearData () {
     this.sensorData = {};
   }
