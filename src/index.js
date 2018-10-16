@@ -66,8 +66,8 @@ const sendDataLoop = () => {
 
   let data = Object.assign(
     {},
-    sensorData.data,
-    {outletStatus: outlets.status},
+    {sensorData: sensorData.getData()},
+    {outletStatus: outlets.getStatus()},
     {initialized},
     {environmentId: config.growEnvironmentId}
   )
