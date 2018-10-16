@@ -3,7 +3,6 @@ import { outletNames } from './const';
 import Logger from './Logger';
 
 const logger = new Logger();
-
 const timeout = ms => new Promise(res => setTimeout(res, ms))
 
 export default class HeatLoop {

@@ -45,6 +45,7 @@ export default class HumdityLoop {
           await this.outlets.turn(outletNames.humidifierFan, true)
         }
       }
+
       await timeout(cycleTime || 5000)
       await this.outlets.turn(outletNames.humidifier, false)
       await this.outlets.turn(outletNames.humidifierFan, false)
