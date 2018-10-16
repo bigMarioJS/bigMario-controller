@@ -4,7 +4,7 @@ export default class SensorData {
     this.lastReading = {};
   }
 
-  get data () {
+  getData () {
     return this.sensorData;
   }
 
@@ -16,6 +16,14 @@ export default class SensorData {
 
   getLastReading () {
     return this.lastReading;
+  }
+
+  getTemp () {
+    return this.lastReading.tempatureCelsiusOne;
+  }
+
+  getHumidity () {
+    return this.lastReading.relativeHumidityOne;
   }
 
   clearData () {
