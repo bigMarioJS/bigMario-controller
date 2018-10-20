@@ -1,6 +1,7 @@
 export default {
   relativeHumidity: {
-    target: 100
+    target: 100,
+    useFanToLower: false
   },
   freshAirExchange: {
     schedules: [

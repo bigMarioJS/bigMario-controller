@@ -27,19 +27,18 @@ export default class HumdityLoop {
     let cycleTime;
     while (true) {
       let output = parseFloat(this.sensorData.getHumidity());
-      console.log('hum lop', output)
       if (!isNaN(this.sensorData.getHumidity())) {
 
         let input = this.ctr.update(output);
         cycleTime = Math.abs(parseInt(input) * 1000) + 5000;
-          console.log('hum input', input)
+
         if (input > 0) {
           logger.info(`Humidity too low. Cycle Humidifer ON cycle for ${cycleTime / 1000} seconds`);
           await this.outlets.turn(outletNames.humidifier, true)
           await this.outlets.turn(outletNames.humidifierFan, true)
         }
 
-        if (input < 0) {
+        if (input < 0 && growProfile.useFanToLower) {
           logger.info(`Humidity too high. Cycle Humidity Fan ON for ${cycleTime / 1000} seconds`);
           await this.outlets.turn(outletNames.humidifier, false)
           await this.outlets.turn(outletNames.humidifierFan, true)
