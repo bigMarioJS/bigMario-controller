@@ -28,7 +28,7 @@ export default class HeatLoop {
       let output = parseFloat(this.sensorData.getTemp());
       if (!isNaN(this.sensorData.getTemp())) {
         let input = this.ctr.update(output);
-        cycleTime = Math.abs(parseInt(input) * 1000) + 300000;
+        cycleTime = Math.abs(parseInt(input) * 1000) + 120000;
         if (input > 0) {
           logger.info(`Cycle heat ON cycle for ${cycleTime / 1000} seconds`);
           await this.outlets.turn(outletNames.heater, true)
@@ -37,7 +37,7 @@ export default class HeatLoop {
           await this.outlets.turn(outletNames.heater, false)
         }
       }
-      await timeout(cycleTime || 300000)
+      await timeout(cycleTime || 120000)
 
     }
   }
