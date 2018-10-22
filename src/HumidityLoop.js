@@ -33,7 +33,7 @@ export default class HumdityLoop {
         cycleTime = Math.abs(parseInt(input) * 1000) + 5000;
 
         if (input > 0) {
-          logger.info(`Humidity too low. Cycle Humidifer ON cycle for ${cycleTime / 1000} seconds`);
+          logger.info(`Humidity ${output} too low. Cycle Humidifer ON cycle for ${cycleTime / 1000} seconds`);
           await this.outlets.turn(outletNames.humidifier, true)
           await this.outlets.turn(outletNames.humidifierFan, true)
         }

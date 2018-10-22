@@ -8,11 +8,11 @@ import express from 'express';
 import WifiOutLets from './WifiOutLets';
 import { outletNames } from './const';
 import Logger from './Logger';
-// import schedule from 'node-schedule';
 import growProfile from './growProfile'
 import HeatLoop from './heatLoop';
 import StatusLoop from './StatusLoop';
 import HumidityLoop from './HumidityLoop'
+import Scheduler from './Scheduler'
 
 const logger = new Logger();
 
@@ -24,9 +24,10 @@ let outlets = new WifiOutLets(config)
 outlets.allOff().then().catch()
 
 
-const heatLoop = new HeatLoop(sensorData, growProfile, outlets)
-const statusLoop = new StatusLoop(sensorData, growProfile, outlets)
-const humidityLoop = new HumidityLoop(sensorData, growProfile, outlets)
+const heatLoop = new HeatLoop(sensorData, growProfile, outlets);
+const statusLoop = new StatusLoop(sensorData, growProfile, outlets);
+const humidityLoop = new HumidityLoop(sensorData, growProfile, outlets);
+const freshAirExchangeSchedule = new FreshAirExchangeSchedule(growProfile, outlets);
 
 
 logger.info("Starting app")
@@ -60,8 +61,6 @@ const initBoard = () => {
   });
 }
 
-
-
 const sendDataLoop = () => {
 
   let data = Object.assign(
@@ -81,41 +80,14 @@ const sendDataLoop = () => {
     });
   }
 
-
-  const humditiyLoop = async () => {
-    let humditiy = sensorData.getData().relativeHumidityOne
-
-    if (humditiy < growProfile.relativeHumidity.low) {
-      logger.info(`Humidity at ${humditiy} below threashold of ${growProfile.relativeHumidity.low}`);
-      let humidifierStatus = await outlets.turn(outletNames.humidifier, true);
-      let humidifierFanStatus = await outlets.turn(outletNames.humidifierFan, true);
-    }
-
-
-    if (humditiy > growProfile.relativeHumidity.high) {
-      logger.info(`Humidity at ${humditiy} above threashold of ${growProfile.relativeHumidity.high}`);
-      let humidifierStatus = await outlets.turn(outletNames.humidifier, false);
-      let humidifierFanStatus = await outlets.turn(outletNames.humidifierFan, false);
-    }
-  }
-
-  const freshAirExchange = (seconds) => {
-    let time = seconds * 1000;
-    outlets.turn(outletNames.freshAirExchange, true)
-    setTimeout(outlets.turn, time, outletNames.freshAirExchange, false)
-  }
-
   const initLoops = () => {
     heatLoop.init();
     statusLoop.startLoop();
     humidityLoop.init();
-    //setInterval(humditiyLoop, config.myceliumHumidityUpdateSeconds);
   }
 
 
   initBoard();
-  // setTimeout(heatLoop.doLoop, 10000);
-  //initSchedules(growProfile.freshAirExchange.schedules, freshAirExchange);
   setInterval(sendDataLoop, config.myceliumApiUpdateSeconds);
 
 
