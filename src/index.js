@@ -27,7 +27,6 @@ outlets.allOff().then().catch()
 const heatLoop = new HeatLoop(sensorData, growProfile, outlets);
 const statusLoop = new StatusLoop(sensorData, growProfile, outlets);
 const humidityLoop = new HumidityLoop(sensorData, growProfile, outlets);
-const freshAirExchangeSchedule = new FreshAirExchangeSchedule(growProfile, outlets);
 
 
 logger.info("Starting app")
