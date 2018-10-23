@@ -3,6 +3,7 @@ export default class SensorData {
     this.sensorData = {};
     this.lastReading = {};
     this.getData = this.getData.bind(this);
+    this.setData = this.setData.bind(this);
   }
 
   getData () {
