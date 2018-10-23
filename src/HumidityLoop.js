@@ -11,8 +11,6 @@ export default class HumdityLoop {
     this.sensorData = sensorData;
     this.growProfile = growProfile;
     this.outlets = outlets;
-    // this.cycleTime = '';
-    // this.cycleTimeSetAt = '';
 
     this.init = this.init.bind(this);
 
