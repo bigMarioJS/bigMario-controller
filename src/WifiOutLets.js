@@ -36,8 +36,8 @@ export default class WifiOutLets {
         key: config.tuyaLocalKey,
         ip: config.tuyaLocalIpAddress
       });
-    } catch (e) {
-      console.log('BAD Tuya configuration', e)
+    } catch (ex) {
+      logger.error('BAD Tuya configuration', ex)
     }
 
     this.updateState();
@@ -73,8 +73,8 @@ export default class WifiOutLets {
       })
       logger.silly(`Updated state: ${JSON.stringify(newState)}`)
       this.state = newState;
-    } catch (e) {
-      logger.error('Unable to update outlet status', e)
+    } catch (ex) {
+      logger.error('Unable to update outlet status', ex)
     }
   }
 
@@ -83,14 +83,13 @@ export default class WifiOutLets {
     logger.info(`Turning ALL OFF`)
     try {
       results = await this.tuya.set({set: 0, dps: this.outletMap[outletNames.all]})
-    } catch (e) {
-      console.log('Unable to turn all devices off', e)
+    } catch (ex) {
+      logger.error('Unable to turn all devices off', ex)
     }
     return results;
   }
 
   async turn (id, state) {
-    let results;
     let tries = 1;
 
     if (this.state[id].state !== state && !this.state[id].requestingChange) {
@@ -113,7 +112,7 @@ export default class WifiOutLets {
       }
 
       if (response === state) {
-        this.state[id].state = results;
+        this.state[id].state = response;
         this.state[id].requestingChange = false;
       }
     }
@@ -122,7 +121,6 @@ export default class WifiOutLets {
   async toggleOutlet (id, state) {
     try {
       let response = await this.tuya.set({set: state, dps: this.outletMap[id]});
-      console.log('toggle outlet', response);
       return response;
     } catch (ex) {
       logger.error(`Unable to to ${id} ${state ? 'ON' : 'OFF'}`, ex)

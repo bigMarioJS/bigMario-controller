@@ -27,8 +27,6 @@ export default class StatusLoop {
       colWidths: [20, 10, 10, 20, 50]
     });
 
-    //let outletStatus = this.outlets.getStatus();
-
     table.push([
       'Temp',
       `${this.sensorData.getTemp()}`,
@@ -43,7 +41,7 @@ export default class StatusLoop {
       `${this.sensorData.getHumidity()}`,
       `${this.growProfile.relativeHumidity.target}`,
       `H ${this.outletStatus(outletNames.humidifier)} F ${this.outletStatus(outletNames.humidifierFan)}`,
-    //  `${this.loops.humidityLoop.getTimeLeftOncycle()}/${this.loops.humidityLoop.getCycleTime()}`
+      `${this.loops.humdityLoop.getTimeLeftOnCycleInSeconds()}/${this.loops.humdityLoop.getCycleTimeInSeconds()}`
     ])
 
     table.push([
