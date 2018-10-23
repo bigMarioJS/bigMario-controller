@@ -24,13 +24,18 @@ export default class SendData {
 }
 
 getData () {
-  return Object.assign(
+  let sensorData = this.sensorData.getData();
+  console.log('sensorDAta', sensorData)
+  let data = Object.assign(
     {},
-    {...this.sensorData.getData()},
+    {...sensorData},
     {outletStatus: this.outlets.getStatus()},
     {initialized: this.initialized},
     {environmentId: config.growEnvironmentId}
-  )
+  );
+
+  console.log('get data', data)
+  return data;
 }
 
   async init() {
