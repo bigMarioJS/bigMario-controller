@@ -14,6 +14,10 @@ export default class HumdityLoop {
 
     this.init = this.init.bind(this);
 
+    this.getTimeLeftOnCycleInSeconds = this.getTimeLeftOnCycleInSeconds.bind(this);
+    this.getCycleTime = this.getCycleTime.bind(this);
+    this.setCycleTime = this.setCycleTime.bind(this);
+
     this.ctr = new Controller({
       k_p: 0.25,
       k_i: 0.05,
@@ -23,32 +27,51 @@ export default class HumdityLoop {
     this.ctr.setTarget(growProfile.relativeHumidity.target);
   }
 
+  setCycleTime(time) {
+    this.cycleTime = time;
+    this.cycleTimeSetAt = new Date().getTime();
+  }
+
+  getCycleTime() {
+    return this.cycleTime;
+  }
+
+  getCycleTimeInSeconds () {
+    return parseInt(this.cycleTime / 1000)
+  }
+
+  getTimeLeftOnCycleInSeconds() {
+    let diff = new Date().getTime() - this.cycleTimeSetAt;
+    return parseInt((this.cycleTime - diff) / 1000)
+  }
+
   async init() {
-    let cycleTime;
     while (true) {
       let output = parseFloat(this.sensorData.getHumidity());
-      if (!isNaN(this.sensorData.getHumidity())) {
 
+      if (!isNaN(this.sensorData.getHumidity())) {
         let input = this.ctr.update(output);
-        cycleTime = Math.abs(parseInt(input) * 1000) + 5000;
+        this.setCycleTime(Math.abs(parseInt(input) * 1000) + 5000);
 
         if (input > 0) {
-          logger.info(`Humidity ${output} too low. Cycle Humidifer ON cycle for ${cycleTime / 1000} seconds`);
-          await this.outlets.turn(outletNames.humidifier, true)
+          logger.info(`Humidity ${output} too low. Cycle Humidifer ON cycle for ${this.getCycleTimeInSeconds} seconds`);
           await this.outlets.turn(outletNames.humidifierFan, true)
+          await timeout(60000) // atempt to reduce water in pipes
+          await this.outlets.turn(outletNames.humidifier, true)
         }
 
         if (input < 0 && growProfile.useFanToLower) {
-          logger.info(`Humidity too high. Cycle Humidity Fan ON for ${cycleTime / 1000} seconds`);
+          logger.info(`Humidity too high. Cycle Humidity Fan ON for ${this.getCycleTimeInSeconds} seconds`);
           await this.outlets.turn(outletNames.humidifier, false)
           await this.outlets.turn(outletNames.humidifierFan, true)
         }
       }
 
-      await timeout(cycleTime || 5000)
+      await timeout(this.getCycleTime() || 5000)
       await this.outlets.turn(outletNames.humidifier, false)
+      await timeout(60000) // atempt to reduce water in pipes
       await this.outlets.turn(outletNames.humidifierFan, false)
-      await timeout(120000)
+      await timeout(1200000)
     }
   }
 }

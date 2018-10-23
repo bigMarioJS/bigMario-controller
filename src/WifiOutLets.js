@@ -3,6 +3,7 @@ import { outletNames } from './const';
 import Logger from './Logger'
 
 const logger = new Logger();
+const timeout = ms => new Promise(res => setTimeout(res, ms))
 
 export default class WifiOutLets {
   constructor (config) {
@@ -70,10 +71,10 @@ export default class WifiOutLets {
           newState[this.reverseOutletMap[dps]].requestingChange = false;
         }
       })
-      logger.info(`Updated state: ${JSON.stringify(newState)}`)
+      logger.silly(`Updated state: ${JSON.stringify(newState)}`)
       this.state = newState;
     } catch (e) {
-      logger.error(e)
+      logger.error('Unable to update outlet status', e)
     }
   }
 
@@ -81,29 +82,51 @@ export default class WifiOutLets {
     let results;
     logger.info(`Turning ALL OFF`)
     try {
-      results = this.tuya.set({set: 0, dps: this.outletMap[outletNames.all]})
+      results = await this.tuya.set({set: 0, dps: this.outletMap[outletNames.all]})
     } catch (e) {
-      console.log('cant update device', e)
+      console.log('Unable to turn all devices off', e)
     }
     return results;
   }
 
   async turn (id, state) {
     let results;
+    let tries = 1;
 
     if (this.state[id].state !== state && !this.state[id].requestingChange) {
-      logger.info(`Turning ${id} ${state ? 'ON' : 'OFF'}`)
 
-      try {
-        this.state[id].requestingChange = true;
-        results = await this.tuya.set({set: state, dps: this.outletMap[id]})
+      logger.info(`Turning ${id} ${state ? 'ON' : 'OFF'}`)
+      this.state[id].requestingChange = true;
+
+      let response = await this.toggleOutlet(id, state);
+
+      while (response != state && tries < 5) {
+        logger.warn(`Previous attempt (${tries}) to turn ${id} ${state ? 'ON' : 'OFF'} failed. Will retry.`)
+        await timeout(7000);
+        response = await this.toggleOutlet(id, state);
+        tries++
+      }
+
+      if (tries > 5) {
+        logger.ERROR(`Previous ${tries} attempts to turn ${id} ${state ? 'ON' : 'OFF'} failed.`)
+        //TODO Alert
+      }
+
+      if (response === state) {
         this.state[id].state = results;
         this.state[id].requestingChange = false;
-      } catch (e) {
-        console.log('cant update device', e)
       }
-      this.updateState();
-      return results;
+    }
+  }
+
+  async toggleOutlet (id, state) {
+    try {
+      let response = await this.tuya.set({set: state, dps: this.outletMap[id]});
+      console.log('toggle outlet', response);
+      return response;
+    } catch (ex) {
+      logger.error(`Unable to to ${id} ${state ? 'ON' : 'OFF'}`, ex)
+      return !state;
     }
   }
 

@@ -6,10 +6,11 @@ const logger = new Logger();
 const timeout = ms => new Promise(res => setTimeout(res, ms))
 
 export default class StatusLoop {
-  constructor(sensorData, growProfile, outlets) {
+  constructor(sensorData, growProfile, outlets, loops) {
     this.sensorData = sensorData;
     this.growProfile = growProfile;
     this.outlets = outlets;
+    this.loops = loops;
 
     this.buildChart = this.buildChart.bind(this)
     this.outletStatus = this.outletStatus.bind(this)
@@ -22,17 +23,18 @@ export default class StatusLoop {
 
   buildChart() {
     const table = new Table({
-      head: ['Element', 'Reading', 'Target', 'Outlet'],
-      colWidths: [20, 10, 10, 20]
+      head: ['Element', 'Reading', 'Target', 'Outlet', 'Cycle'],
+      colWidths: [20, 10, 10, 20, 50]
     });
 
-    let outletStatus = this.outlets.getStatus();
+    //let outletStatus = this.outlets.getStatus();
 
     table.push([
       'Temp',
       `${this.sensorData.getTemp()}`,
       this.growProfile.temp,
       `${this.outletStatus(outletNames.heater)}`,
+      `${this.loops.heatLoop.getTimeLeftOnCycleInSeconds()}/${this.loops.heatLoop.getCycleTimeInSeconds()}`
     ])
 
 
@@ -40,7 +42,8 @@ export default class StatusLoop {
       'Humidity',
       `${this.sensorData.getHumidity()}`,
       `${this.growProfile.relativeHumidity.target}`,
-      `H ${this.outletStatus(outletNames.humidifier)} F ${this.outletStatus(outletNames.humidifierFan)}`
+      `H ${this.outletStatus(outletNames.humidifier)} F ${this.outletStatus(outletNames.humidifierFan)}`,
+    //  `${this.loops.humidityLoop.getTimeLeftOncycle()}/${this.loops.humidityLoop.getCycleTime()}`
     ])
 
     table.push([
@@ -48,9 +51,10 @@ export default class StatusLoop {
       '',
       '',
       `${this.outletStatus(outletNames.exhaustFan)}`,
+      ''
     ])
+
    logger.info(`Current Status:\n${table.toString()}`);
-    //console.log(table.toString())
   }
 
   async startLoop() {

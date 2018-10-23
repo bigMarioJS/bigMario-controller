@@ -1,0 +1,55 @@
+
+
+import Logger from './Logger';
+import config from './config';
+import axios from 'axios';
+const logger = new Logger();
+
+const timeout = ms => new Promise(res => setTimeout(res, ms))
+
+export default class SendData {
+
+  constructor(sensorData, growProfile, outlets, initialized) {
+    this.sensorData = sensorData;
+    this.growProfile = growProfile;
+    this.outlets = outlets;
+    this.initialized = initialized;
+
+    this.init = this.init.bind(this);
+    this.getData = this.getData.bind(this)
+  }
+
+ async sendData(data) {
+  return axios.post(config.myceliumApiUri, data, {headers: { 'x-api-key': config.myceliumApiSecret}})
+  // .catch((error) => console.log("Error contacting endpoint", error))
+  // .finally(()=>{
+  //  sensorData.clearData();
+  // });
+}
+
+getData () {
+  return Object.assign(
+    {},
+    {...this.sensorData.getData()},
+    {outletStatus: this.outlets.getStatus()},
+    {initialized: this.initialized},
+    {environmentId: config.growEnvironmentId}
+  )
+}
+
+  async init() {
+    while (true) {
+      let data = this.getData()
+
+      try {
+        await this.sendData(data);
+        logger.silly(`Data sent: ${JSON.stringify(data, null, 2)}`)
+      } catch (ex) {
+        logger.error(`Data send failed: ${ex}`)
+      }
+
+      await timeout(config.myceliumApiUpdateSeconds)
+      this.sensorData.clearData();
+    }
+  }
+}
