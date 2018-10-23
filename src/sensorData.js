@@ -2,6 +2,7 @@ export default class SensorData {
   constructor() {
     this.sensorData = {};
     this.lastReading = {};
+    this.getData = this.getData.bind(this);
   }
 
   getData () {
