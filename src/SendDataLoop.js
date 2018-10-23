@@ -38,12 +38,11 @@ getData () {
   async init() {
     while (true) {
       let data = this.getData()
-
       try {
         await this.sendData(data);
         logger.silly(`Data sent: ${JSON.stringify(data, null, 2)}`)
       } catch (ex) {
-        logger.error(`Data send failed: ${ex}`)
+        logger.error('Data send failed', ex)
       }
 
       await timeout(config.myceliumApiUpdateSeconds)

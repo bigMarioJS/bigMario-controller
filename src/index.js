@@ -56,9 +56,11 @@ const initBoard = () => {
     debug: false,
   });
 
+  console.log(board)
+
   board.on("ready", function() {
     initialized = true;
-
+    logger.info('Board Ready')
     initLoops()
 
     var sensor = new five.Multi({
@@ -75,6 +77,7 @@ const initBoard = () => {
 }
 
   const initLoops = () => {
+    console.log('initing loops')
     loops.heatLoop.init();
     loops.humidityLoop.init();
     loops.statusLoop.startLoop();
