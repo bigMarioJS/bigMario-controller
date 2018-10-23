@@ -5,6 +5,6 @@ export default class Alert {
 
   send(message) {
     // TODO: twillio or something
-    console.log('SEND ALERT:' message)
+    console.log('SEND ALERT:', message)
   }
 }
