@@ -25,6 +25,7 @@ export default class SendData {
 
 getData () {
   let sensorData = this.sensorData.getData();
+
   console.log('sensorDAta', sensorData)
   let data = Object.assign(
     {},
