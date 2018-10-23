@@ -47,7 +47,7 @@ app.get('/initialized', (req, res) => res.send({initialized}))
 app.listen(config.statusPort.port, () => console.log(`MyceliumJS listening on port ${config.statusPort}!`))
 
 
-
+// TODO move to own file
 const initBoard = () => {
   let board = new five.Board({
     repl: false,
@@ -71,25 +71,6 @@ const initBoard = () => {
     })
   });
 }
-
-// const sendDataLoop = () => {
-
-//   let data = Object.assign(
-//     {},
-//     {...sensorData.getData()},
-//     {outletStatus: outlets.getStatus()},
-//     {initialized},
-//     {environmentId: config.growEnvironmentId}
-//   )
-
-//   //logger.silly(`Sending Data: ${JSON.stringify(data, null, 2)}`)
-
-//   axios.post(config.myceliumApiUri, data, {headers: { 'x-api-key': config.myceliumApiSecret}})
-//     .catch((error) => console.log("Error contacting endpoint", error))
-//     .finally(()=>{
-//      sensorData.clearData();
-//     });
-//   }
 
   const initLoops = () => {
     loops.heatLoop.init();

@@ -1,5 +1,5 @@
 #### cultivator-controller
 
-Johnny-Five reading sesnsors
 
-```npm run
+
+### Configure Tuya

@@ -21,10 +21,6 @@ export default class SendData {
 
  async sendData(data) {
   return axios.post(config.myceliumApiUri, data, {headers: { 'x-api-key': config.myceliumApiSecret}})
-  // .catch((error) => console.log("Error contacting endpoint", error))
-  // .finally(()=>{
-  //  sensorData.clearData();
-  // });
 }
 
 getData () {
@@ -49,6 +45,7 @@ getData () {
       }
 
       await timeout(config.myceliumApiUpdateSeconds)
+      // TODO: send data loop clearing data, smells
       this.sensorData.clearData();
     }
   }

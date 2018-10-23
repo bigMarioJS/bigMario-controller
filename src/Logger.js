@@ -1,5 +1,6 @@
-//import bunyan from 'bunyan';
 import moment from 'moment'
+
+//TODO get real logger
 
 const getTimeStamp = () => moment().format('HH:MM:SS');
 
@@ -21,6 +22,7 @@ export default class Logger {
   }
 
   error (message, error) {
+    //TODO log to api
     console.log(`[${getTimeStamp()}] ERROR ${message} Stack: ${error}`)
   }
 }

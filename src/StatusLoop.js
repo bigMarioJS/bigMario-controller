@@ -24,7 +24,7 @@ export default class StatusLoop {
   buildChart() {
     const table = new Table({
       head: ['Element', 'Reading', 'Target', 'Outlet', 'Cycle'],
-      colWidths: [20, 10, 10, 20, 50]
+      colWidths: [20, 10, 10, 20, 20]
     });
 
     table.push([
@@ -41,7 +41,7 @@ export default class StatusLoop {
       `${this.sensorData.getHumidity()}`,
       `${this.growProfile.relativeHumidity.target}`,
       `H ${this.outletStatus(outletNames.humidifier)} F ${this.outletStatus(outletNames.humidifierFan)}`,
-      `${this.loops.humdityLoop.getTimeLeftOnCycleInSeconds()}/${this.loops.humdityLoop.getCycleTimeInSeconds()}`
+      `${this.loops.humidityLoop.getTimeLeftOnCycleInSeconds()}/${this.loops.humidityLoop.getCycleTimeInSeconds()}`
     ])
 
     table.push([

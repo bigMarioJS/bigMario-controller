@@ -1,3 +1,5 @@
+//TODO this needs to live on the API and be fetched
+
 export default {
   relativeHumidity: {
     target: 100,
