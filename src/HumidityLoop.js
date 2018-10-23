@@ -11,8 +11,8 @@ export default class HumdityLoop {
     this.sensorData = sensorData;
     this.growProfile = growProfile;
     this.outlets = outlets;
-    this.cycleTime = '';
-    this.cycleTimeSetAt = '';
+    // this.cycleTime = '';
+    // this.cycleTimeSetAt = '';
 
     this.init = this.init.bind(this);
 
@@ -20,13 +20,14 @@ export default class HumdityLoop {
     this.getCycleTime = this.getCycleTime.bind(this);
     this.setCycleTime = this.setCycleTime.bind(this);
 
+
     this.ctr = new Controller({
       k_p: 0.25,
       k_i: 0.05,
       k_d: 0.05,
     });
 
-    this.ctr.setTarget(growProfile.relativeHumidity.target);
+    this.ctr.setTarget(this.growProfile.relativeHumidity.target);
   }
 
   setCycleTime(time) {
@@ -53,7 +54,7 @@ export default class HumdityLoop {
 
       if (!isNaN(this.sensorData.getHumidity())) {
         let input = this.ctr.update(output);
-        this.setCycleTime(Math.abs(parseInt(input) * 1000));
+        this.setCycleTime(Math.abs(parseInt(input) * 1000) + 20000);
 
         if (input > 0) {
           logger.info(`Humidity ${output} too low. Cycle Humidifer ON cycle for ${this.getCycleTimeInSeconds()} seconds`);
@@ -62,18 +63,20 @@ export default class HumdityLoop {
           await this.outlets.turn(outletNames.humidifier, true)
         }
 
-        if (input < 0 && growProfile.useFanToLower) {
+        if (input < 0 && this.growProfile.useFanToLower) {
           logger.info(`Humidity too high. Cycle Humidity Fan ON for ${this.getCycleTimeInSeconds()} seconds`);
           await this.outlets.turn(outletNames.humidifier, false)
-          await timeout(5000)
           await this.outlets.turn(outletNames.humidifierFan, true)
         }
       }
 
-      await timeout(this.getCycleTime() || 5000)
+      await timeout(this.getCycleTime() || 10000)
       await this.outlets.turn(outletNames.humidifier, false)
+      await timeout(5000)
       await this.outlets.turn(outletNames.humidifierFan, false)
-      await timeout(120000)
+      this.setCycleTime(60000)
+      logger.info(`Humidity cycle hold for ${this.getCycleTimeInSeconds()} seconds`);
+      await timeout(this.getCycleTime())
     }
   }
 }

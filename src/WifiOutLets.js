@@ -98,8 +98,9 @@ export default class WifiOutLets {
       this.state[id].requestingChange = true;
 
       let response = await this.toggleOutlet(id, state);
+      console.log('response',response)
 
-      while (response != state && tries < 5) {
+      while (response != true && tries < 5) {
         logger.warn(`Previous attempt (${tries}) to turn ${id} ${state ? 'ON' : 'OFF'} failed. Will retry.`)
         await timeout(7000);
         response = await this.toggleOutlet(id, state);
@@ -111,8 +112,8 @@ export default class WifiOutLets {
         //TODO Alert
       }
 
-      if (response === state) {
-        this.state[id].state = response;
+      if (response === true) {
+        this.state[id].state = state;
         this.state[id].requestingChange = false;
       }
     }
