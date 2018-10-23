@@ -11,6 +11,8 @@ export default class HumdityLoop {
     this.sensorData = sensorData;
     this.growProfile = growProfile;
     this.outlets = outlets;
+    this.cycleTime = '';
+    this.cycleTimeSetAt = '';
 
     this.init = this.init.bind(this);
 
@@ -51,23 +53,23 @@ export default class HumdityLoop {
 
       if (!isNaN(this.sensorData.getHumidity())) {
         let input = this.ctr.update(output);
-        this.setCycleTime(Math.abs(parseInt(input) * 1000) + 5000);
+        this.setCycleTime(Math.abs(parseInt(input) * 1000) + 60000 + 1200000);
 
         if (input > 0) {
-          logger.info(`Humidity ${output} too low. Cycle Humidifer ON cycle for ${this.getCycleTimeInSeconds} seconds`);
+          logger.info(`Humidity ${output} too low. Cycle Humidifer ON cycle for ${this.getCycleTimeInSeconds()} seconds`);
           await this.outlets.turn(outletNames.humidifierFan, true)
-          await timeout(60000) // atempt to reduce water in pipes
+          // await timeout(60000) // atempt to reduce water in pipes
           await this.outlets.turn(outletNames.humidifier, true)
         }
 
         if (input < 0 && growProfile.useFanToLower) {
-          logger.info(`Humidity too high. Cycle Humidity Fan ON for ${this.getCycleTimeInSeconds} seconds`);
+          logger.info(`Humidity too high. Cycle Humidity Fan ON for ${this.getCycleTimeInSeconds()} seconds`);
           await this.outlets.turn(outletNames.humidifier, false)
           await this.outlets.turn(outletNames.humidifierFan, true)
         }
       }
 
-      await timeout(this.getCycleTime() || 5000)
+      await timeout(this.getCycleTime() - 60000 - 1200000 || 5000)
       await this.outlets.turn(outletNames.humidifier, false)
       await timeout(60000) // atempt to reduce water in pipes
       await this.outlets.turn(outletNames.humidifierFan, false)

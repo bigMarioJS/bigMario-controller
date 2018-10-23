@@ -15,7 +15,8 @@ import WifiOutLets from './WifiOutLets';
 import HeatLoop from './HeatLoop';
 import StatusLoop from './StatusLoop';
 import HumidityLoop from './HumidityLoop'
-import SendDataLoop from "./SendDataLoop";
+import SendDataLoop from './SendDataLoop';
+import Scheduler from './Scheduler'
 
 const logger = new Logger();
 
@@ -37,6 +38,7 @@ let loops = {
 }
 
 loops.statusLoop = new StatusLoop(sensorData, growProfile, outlets, loops)
+let scheduler = new Scheduler(growProfile, outlets);
 
 
 logger.info("Starting app")
@@ -76,9 +78,10 @@ const initBoard = () => {
     loops.heatLoop.init();
     loops.humidityLoop.init();
     loops.statusLoop.startLoop();
+
   }
 
-
+  scheduler.init()
   initBoard();
   loops.sendDataLoop.init()
   //setInterval(sendDataLoop, config.myceliumApiUpdateSeconds);

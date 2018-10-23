@@ -35,7 +35,6 @@ export default class StatusLoop {
       `${this.loops.heatLoop.getTimeLeftOnCycleInSeconds()}/${this.loops.heatLoop.getCycleTimeInSeconds()}`
     ])
 
-
     table.push([
       'Humidity',
       `${this.sensorData.getHumidity()}`,
