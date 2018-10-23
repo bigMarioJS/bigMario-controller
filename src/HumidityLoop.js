@@ -69,10 +69,10 @@ export default class HumdityLoop {
         }
       }
 
-      await timeout(this.getCycleTime()|| 5000)
+      await timeout(this.getCycleTime() || 5000)
       await this.outlets.turn(outletNames.humidifier, false)
       await this.outlets.turn(outletNames.humidifierFan, false)
-      await timeout(1200000)
+      await timeout(120000)
     }
   }
 }
