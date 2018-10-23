@@ -53,7 +53,7 @@ export default class HumdityLoop {
 
       if (!isNaN(this.sensorData.getHumidity())) {
         let input = this.ctr.update(output);
-        this.setCycleTime(Math.abs(parseInt(input) * 1000) + 60000 + 120000);
+        this.setCycleTime(Math.abs(parseInt(input) * 1000));
 
         if (input > 0) {
           logger.info(`Humidity ${output} too low. Cycle Humidifer ON cycle for ${this.getCycleTimeInSeconds()} seconds`);
@@ -69,9 +69,8 @@ export default class HumdityLoop {
         }
       }
 
-      await timeout(this.getCycleTime() - 60000 - 1200000 || 5000)
+      await timeout(this.getCycleTime()|| 5000)
       await this.outlets.turn(outletNames.humidifier, false)
-      await timeout(60000) // atempt to reduce water in pipes
       await this.outlets.turn(outletNames.humidifierFan, false)
       await timeout(1200000)
     }
