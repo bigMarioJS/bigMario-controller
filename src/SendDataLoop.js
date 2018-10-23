@@ -26,17 +26,13 @@ export default class SendData {
 getData () {
   let sensorData = this.sensorData.getData();
 
-  console.log('sensorDAta', sensorData)
-  let data = Object.assign(
+  return  Object.assign(
     {},
     {...sensorData},
     {outletStatus: this.outlets.getStatus()},
     {initialized: this.initialized},
     {environmentId: config.growEnvironmentId}
   );
-
-  console.log('get data', data)
-  return data;
 }
 
   async init() {
