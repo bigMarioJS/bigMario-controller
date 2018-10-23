@@ -58,13 +58,14 @@ export default class HumdityLoop {
         if (input > 0) {
           logger.info(`Humidity ${output} too low. Cycle Humidifer ON cycle for ${this.getCycleTimeInSeconds()} seconds`);
           await this.outlets.turn(outletNames.humidifierFan, true)
-          // await timeout(60000) // atempt to reduce water in pipes
+          await timeout(5000)
           await this.outlets.turn(outletNames.humidifier, true)
         }
 
         if (input < 0 && growProfile.useFanToLower) {
           logger.info(`Humidity too high. Cycle Humidity Fan ON for ${this.getCycleTimeInSeconds()} seconds`);
           await this.outlets.turn(outletNames.humidifier, false)
+          await timeout(5000)
           await this.outlets.turn(outletNames.humidifierFan, true)
         }
       }

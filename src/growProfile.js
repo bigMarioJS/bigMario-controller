@@ -2,7 +2,7 @@
 
 export default {
   relativeHumidity: {
-    target: 100,
+    target: 95,
     useFanToLower: false
   },
     schedules: [
