@@ -10,7 +10,7 @@ export default class Logger {
   }
 
   silly (msg) {
-    //console.log(`[${getTimeStamp()}] SILLY ${msg}`)
+    console.log(`[${getTimeStamp()}] SILLY ${msg}`)
   }
 
   info (msg) {

@@ -29,6 +29,7 @@ export default class WifiOutLets {
     this.reverseOutletMap = this.makeReverseOutLetMap();
 
     this.getStatus = this.getStatus.bind(this);
+    // this.checkState = this.checkState.bind(this)
 
     try {
       this.tuya = new TuyaDevice({
@@ -78,6 +79,19 @@ export default class WifiOutLets {
     }
   }
 
+  // async checkState () {
+  //   let status = await this.tuya.get({schema: true});
+  //   let misMatches = []
+
+  //   Object.keys(status.dps).forEach(dps => {
+  //     if (this.reverseOutletMap[dps]) {
+  //       if (this.state[this.reverseOutletMap[dps]].state != status.dps[dps]) {
+  //         console.log('mismatch expect',this.reverseOutletMap[dps],  this.reverseOutletMap[dps].state, status.dps[dps])
+  //       }
+  //     }
+  //   })
+  // }
+
   async allOff () {
     let results;
     logger.info(`Turning ALL OFF`)
@@ -116,6 +130,10 @@ export default class WifiOutLets {
         this.state[id].state = state;
         this.state[id].requestingChange = false;
       }
+
+      this.updateState();
+
+      return response;
     }
   }
 
@@ -124,7 +142,7 @@ export default class WifiOutLets {
       let response = await this.tuya.set({set: state, dps: this.outletMap[id]});
       return response;
     } catch (ex) {
-      logger.error(`Unable to to ${id} ${state ? 'ON' : 'OFF'}`, ex)
+      logger.error(`Unable to turn ${id} ${state ? 'ON' : 'OFF'}`, ex)
       return !state;
     }
   }
