@@ -1,6 +1,6 @@
 
 import schedule from 'node-schedule';
-import Logger from './Logger';
+import Logger from '../utils/Logger';
 
 const logger = new Logger();
 const timeout = ms => new Promise(res => setTimeout(res, ms))
@@ -22,7 +22,6 @@ export default class Scheduler {
   }
 
   init () {
-    console.log('her')
     this.growProfile.schedules.forEach((s)=> {
       let job = schedule.scheduleJob(s.cron, () => {this.cycleOutlet(s.outlet, s.runTimeSeconds)})
       let nextTime = job.nextInvocation()._date.toString()

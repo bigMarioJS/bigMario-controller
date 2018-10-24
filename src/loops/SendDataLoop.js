@@ -1,7 +1,7 @@
 
 
-import Logger from './Logger';
-import config from './config';
+import Logger from '../utils/Logger';
+import config from '../utils/config';
 import axios from 'axios';
 const logger = new Logger();
 

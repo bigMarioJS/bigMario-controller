@@ -4,28 +4,34 @@ import five from 'johnny-five';
 import axios from 'axios';
 import express from 'express';
 
-import config from './config';
+import config from './utils/config';
 
-import Logger from './Logger';
+import Logger from './utils/Logger';
 import growProfile from './growProfile'
 
-import SensorData from './sensorData';
-import WifiOutLets from './WifiOutLets';
+import SensorData from './inputs/sensorData';
+import OutLets from './outputs/OutLets';
 
-import HeatLoop from './HeatLoop';
-import StatusLoop from './StatusLoop';
-import HumidityLoop from './HumidityLoop'
-import SendDataLoop from './SendDataLoop';
-import Scheduler from './Scheduler'
+import HeatLoop from './Loops/HeatLoop';
+import StatusLoop from './Loops/StatusLoop';
+import HumidityLoop from './Loops/HumidityLoop'
+import SendDataLoop from './Loops/SendDataLoop';
+
+import Scheduler from './loops/Scheduler'
 
 const logger = new Logger();
 
 let initialized = false;
 
-let sensorData = new SensorData();
-let outlets = new WifiOutLets(config)
+let sensorData = new SensorData()     ;
+let outlets = new OutLets(config)
 
-outlets.allOff().then().catch()
+//clean up
+outlets.init().then(()=> outlets.allOff()).then(()=> outlets.startLoop())
+
+// Clean up
+// outlets.allOff().then().catch()
+
 
 const heatLoop = new HeatLoop(sensorData, growProfile, outlets);
 const humidityLoop = new HumidityLoop(sensorData, growProfile, outlets);
@@ -56,8 +62,6 @@ const initBoard = () => {
     debug: false,
   });
 
-  console.log(board)
-
   board.on("ready", function() {
     initialized = true;
     logger.info('Board Ready')
@@ -77,11 +81,9 @@ const initBoard = () => {
 }
 
   const initLoops = () => {
-    console.log('initing loops')
     loops.heatLoop.init();
     loops.humidityLoop.init();
     loops.statusLoop.startLoop();
-
   }
 
   scheduler.init()

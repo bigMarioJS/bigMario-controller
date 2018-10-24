@@ -23,14 +23,14 @@
     "@babel/plugin-transform-destructuring": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
     "@babel/preset-es2017": "^7.0.0-beta.53",
-    "@babel/preset-stage-0": "^7.0.0",
     "axios": "^0.18.0",
-    "babel-jest": "^23.4.2",
+    "babel-jest": "^23.6.0",
     "body-parser": "^1.18.3",
     "bunyan": "^1.8.12",
     "cli-table": "^0.3.1",
     "cron-parser": "^2.5.0",
     "express": "^4.16.3",
+    "jest": "^23.6.0",
     "johnny-five": "1.0.0",
     "moment": "^2.22.2",
     "node-pid-controller": "^1.0.1",
@@ -38,5 +38,10 @@
     "table": "^5.1.0",
     "tuyapi": "^3.0.2"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "babel-core": "^7.0.0-bridge.0"
+  },
+  "resolutions": {
+    "babel-core": "7.0.0-bridge.0"
+  }
 }

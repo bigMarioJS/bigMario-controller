@@ -1,6 +1,6 @@
 import Controller from 'node-pid-controller';
-import { outletNames } from './const';
-import Logger from './Logger';
+import { outletNames } from '../const'
+import Logger from '../utils/Logger';
 
 const logger = new Logger();
 const timeout = ms => new Promise(res => setTimeout(res, ms))
