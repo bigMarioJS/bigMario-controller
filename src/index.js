@@ -10,7 +10,7 @@ import Logger from './utils/Logger';
 import growProfile from './growProfile'
 
 import SensorData from './inputs/sensorData';
-import OutLets from './outputs/OutLets';
+import Outlets from './outputs/Outlets';
 
 import HeatLoop from './Loops/HeatLoop';
 import StatusLoop from './Loops/StatusLoop';
@@ -24,7 +24,7 @@ const logger = new Logger();
 let initialized = false;
 
 let sensorData = new SensorData()     ;
-let outlets = new OutLets(config)
+let outlets = new Outlets(config)
 
 //clean up
 outlets.init().then(()=> outlets.allOff()).then(()=> outlets.startLoop())
