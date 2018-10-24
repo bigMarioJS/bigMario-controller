@@ -13,7 +13,7 @@ import SensorData from './inputs/sensorData';
 import Outlets from './outputs/Outlets';
 
 import HeatLoop from './loops/HeatLoop';
-import StatusLoop from '.loops/StatusLoop';
+import StatusLoop from './loops/StatusLoop';
 import HumidityLoop from './loops/HumidityLoop'
 import SendDataLoop from './loops/SendDataLoop';
 
