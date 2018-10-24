@@ -12,10 +12,10 @@ import growProfile from './growProfile'
 import SensorData from './inputs/sensorData';
 import Outlets from './outputs/Outlets';
 
-import HeatLoop from './Loops/HeatLoop';
-import StatusLoop from './Loops/StatusLoop';
-import HumidityLoop from './Loops/HumidityLoop'
-import SendDataLoop from './Loops/SendDataLoop';
+import HeatLoop from './loops/HeatLoop';
+import StatusLoop from '.lLoops/StatusLoop';
+import HumidityLoop from './loops/HumidityLoop'
+import SendDataLoop from './loops/SendDataLoop';
 
 import Scheduler from './loops/Scheduler'
 
