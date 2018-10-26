@@ -60,7 +60,6 @@ export default class HeatLoop {
         }
       }
       await timeout(this.getCycleTime() || 10000)
-
     }
   }
 }

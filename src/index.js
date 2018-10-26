@@ -11,6 +11,7 @@ import growProfile from './growProfile'
 
 import SensorData from './inputs/sensorData';
 import Outlets from './outputs/Outlets';
+import Board from './inputs/Board'
 
 import HeatLoop from './loops/HeatLoop';
 import StatusLoop from './loops/StatusLoop';
@@ -21,31 +22,22 @@ import Scheduler from './loops/Scheduler'
 
 const logger = new Logger();
 
-let initialized = false;
+let initialized;
 
-let sensorData = new SensorData()     ;
-let outlets = new Outlets(config)
+const sensorData = new SensorData();
+const board = new Board(sensorData);
+const outlets = new Outlets(config);
 
-//clean up
-outlets.init().then(()=> outlets.allOff()).then(()=> outlets.startLoop())
-
-// Clean up
-// outlets.allOff().then().catch()
-
-
-const heatLoop = new HeatLoop(sensorData, growProfile, outlets);
-const humidityLoop = new HumidityLoop(sensorData, growProfile, outlets);
-const sendDataLoop = new SendDataLoop(sensorData, growProfile, outlets, initialized);
 
 let loops = {
-  heatLoop,
-  humidityLoop,
-  sendDataLoop,
+  heatLoop: new HeatLoop(sensorData, growProfile, outlets),
+  humidityLoop: new HumidityLoop(sensorData, growProfile, outlets),
+  sendDataLoop: new SendDataLoop(sensorData, growProfile, outlets, initialized)
 }
 
 loops.statusLoop = new StatusLoop(sensorData, growProfile, outlets, loops)
-let scheduler = new Scheduler(growProfile, outlets);
 
+const scheduler = new Scheduler(growProfile, outlets);
 
 logger.info("Starting app")
 
@@ -56,29 +48,32 @@ app.listen(config.statusPort.port, () => console.log(`MyceliumJS listening on po
 
 
 // TODO move to own file
-const initBoard = () => {
-  let board = new five.Board({
-    repl: false,
-    debug: false,
-  });
+// const initBoard = () => {
+//   let board = new five.Board({
+//     repl: false,
+//     debug: false,
+//   });
 
-  board.on("ready", function() {
-    initialized = true;
-    logger.info('Board Ready')
-    initLoops()
+//   board.on("ready", function() {
+//     initialized.board = true;
+//     logger.info('Board Ready')
+//     initLoops()
 
-    var sensor = new five.Multi({
-      controller: "HTU21D"
-    });
+//     var sensor = new five.Multi({
+//       controller: "HTU21D"
+//     });
 
-    sensor.on("change", function() {
-      sensorData.setData({
-        relativeHumidityOne: this.hygrometer.relativeHumidity,
-        tempatureCelsiusOne: this.thermometer.celsius
-      })
-    })
-  });
-}
+//     sensor.on("change", function() {
+//       initialized.sensor = true;
+//       sensorData.setData({
+//         relativeHumidityOne: this.hygrometer.relativeHumidity,
+//         tempatureCelsiusOne: this.thermometer.celsius
+//       })
+//     })
+//   });
+// }
+
+
 
   const initLoops = () => {
     loops.heatLoop.init();
@@ -86,9 +81,54 @@ const initBoard = () => {
     loops.statusLoop.startLoop();
   }
 
-  scheduler.init()
-  initBoard();
-  loops.sendDataLoop.init()
+  //then(()=> outlets.startLoop())
+
+  //scheduler.init()
+  //initBoard();
+  //loops.sendDataLoop.init()
+
+
+const init = async () => {
+
+    // TODOD get config then pass in to other constructors
+
+    try {
+      logger.info('Intializing arduino board...')
+      await board.init(); // returns promise when get first sensor data back
+
+      logger.info('Intializing outlets...')
+      await outlets.init()
+
+    } catch (ex) {
+      logger.error('Unable to intialize', ex)
+    }
+
+    logger.info('Intializing schedules...')
+    scheduler.init()
+
+    logger.info('Intializing data sender...')
+    loops.sendDataLoop.init()
+
+    logger.info('Intializing loops...')
+    initLoops();
+
+    initialized = true;
+    logger.info('Initialization complete')
+
+
+    // while(!initialized.board && !initialized.sensor && !intialized.outlets) {
+      // console.log('inputs and out puts inited')
+
+      //init all loops
+
+      //start outlet self repair loop
+
+
+      // init send data loop
+
+    // }
+  }
   //setInterval(sendDataLoop, config.myceliumApiUpdateSeconds);
 
 
+init().catch(()=> {})

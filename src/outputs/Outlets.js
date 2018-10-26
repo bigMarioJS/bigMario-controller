@@ -30,8 +30,9 @@ export default class WifiOutLets {
     this.config = config;
     this.state = this.initState;
     this.reverseOutletMap = this.makeReverseOutLetMap();
-    this.checkForBadStates = this.checkForBadStates.bind(this)
-    this.startLoop = this.startLoop.bind(this)
+    this.checkForBadStates = this.checkForBadStates.bind(this);
+    // this.startLoop = this.startLoop.bind(this);
+    this.initSelfRepairLoop = this.initSelfRepairLoop.bind(this);
 
     this.getStatus = this.getStatus.bind(this);
 
@@ -62,14 +63,27 @@ export default class WifiOutLets {
       this.tuya = await this.initOutlets()
     } catch (ex) {
       logger.error('BAD Tuya configuration', ex)
+      return false;
+    }
+
+    try {
+      await this.tuya.set({set: 0, dps: this.outletMap[outletNames.all]})
+    } catch (ex) {
+      logger.error('Unable to set all outlets to OFF', ex)
+      return false;
     }
 
     try {
       this.state = await this.updateState()
     } catch (ex) {
       logger.error('Cannot update initial state', ex)
+      return false;
     }
+
+    this.initSelfRepairLoop();
+
     return true;
+
   }
 
   async initOutlets () {
@@ -80,13 +94,17 @@ export default class WifiOutLets {
     });
   }
 
- async startLoop () {
+ async initSelfRepairLoop () {
    while (true) {
     let badStates = await this.checkForBadStates()
       for (let key in badStates ) {
         logger.warn(`Bad outlet state found. Expected ${key} to be ${badStates[key] ? 'ON' : 'OFF'}`)
-      await this.turn(key, badStates[key], true)
-      await timeout(50000)
+        try {
+          await this.turn(key, badStates[key], true)
+          await timeout(50000)
+        } catch (ex) {
+          logger.error(`Unable to recover ${key} from bad state`)
+        }
     }
     await timeout(10000)
   }
@@ -144,7 +162,7 @@ export default class WifiOutLets {
 
   async allOff () {
     let results;
-    logger.info(`Turning ALL OFF`)
+    logger.info(`Turning ALL outlets OFF`)
     try {
       results = await this.tuya.set({set: 0, dps: this.outletMap[outletNames.all]})
     } catch (ex) {
