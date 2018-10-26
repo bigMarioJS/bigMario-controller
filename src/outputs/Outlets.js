@@ -78,8 +78,18 @@ export default class WifiOutLets {
 
  async initSelfRepairLoop () {
    logger.info('Starting outlet self repair loop')
+   let checks = 0;
+
    while (true) {
     let badStates = await this.checkForBadStates()
+    checks++
+
+    if (checks > 10) {
+      logger.info(`Self repair has checked for bad states ${checks} times since last report`)
+      checks = 0;
+    }
+
+
       for (let key in badStates ) {
         logger.warn(`Bad outlet state found. Expected ${key} to be ${badStates[key] ? 'ON' : 'OFF'}`)
         try {
@@ -142,8 +152,6 @@ export default class WifiOutLets {
     } catch (ex) {
       logger.error('Unable to check for bad states')
     }
-
-    console.log('checked for bad states got', status)
 
     let results = {};
 
