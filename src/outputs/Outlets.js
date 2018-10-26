@@ -34,6 +34,9 @@ export default class WifiOutLets {
     this.initSelfRepairLoop = this.initSelfRepairLoop.bind(this);
     this.getStatus = this.getStatus.bind(this);
     this.init = this.init.bind(this);
+    this.getOutletNameByDps = this.getOutletNameByDps.bind(this);
+    this.getOutletByDps = this.getOutletByDps.bind(this);
+    this.updateState = this.updateState.bind(this)
   }
 
   async init () {
@@ -74,13 +77,13 @@ export default class WifiOutLets {
   }
 
  async initSelfRepairLoop () {
+   logger.info('Starting outlet self repair loop')
    while (true) {
     let badStates = await this.checkForBadStates()
       for (let key in badStates ) {
         logger.warn(`Bad outlet state found. Expected ${key} to be ${badStates[key] ? 'ON' : 'OFF'}`)
         try {
           await this.turn(key, badStates[key], true)
-          await timeout(50000)
         } catch (ex) {
           logger.error(`Unable to recover ${key} from bad state`)
         }
@@ -121,22 +124,36 @@ export default class WifiOutLets {
     } catch (ex) {
       logger.error('Unable to get states from Tuya', ex)
     }
+    this.state = newState;
     return newState;
   }
 
   async checkForBadStates () {
-    let status = await this.tuya.get({schema: true});
+    let status;
+    try {
+      status = await this.tuya.get({schema: true});
+    } catch (ex) {
+      logger.error('Unable to check for bad states')
+    }
 
     let results = {};
 
     Object.keys(status.dps).forEach(dps => {
       if (this.reverseOutletMap[dps]) {
-        if (this.state[this.reverseOutletMap[dps]].state != status.dps[dps]) {
-          results[this.reverseOutletMap[dps]] = this.state[this.reverseOutletMap[dps]].state
+        if (this.getOutletByDps(dps).state != status.dps[dps] && !this.getOutletByDps(dps).requestingChange ) {
+          results[this.getOutletNameByDps(dps)] = this.state[this.getOutletNameByDps(dps)].state
         }
       }
     })
     return results;
+  }
+
+  getOutletNameByDps(dps) {
+    return this.reverseOutletMap[dps];
+  }
+
+  getOutletByDps(dps) {
+    return this.state[this.getOutletNameByDps(dps)];
   }
 
   async allOff () {
@@ -160,6 +177,7 @@ export default class WifiOutLets {
 
       let response = await this.toggleOutlet(id, state);
 
+
       while (response !== true && tries < 6) {
         logger.warn(`Previous attempt (${tries}) to turn ${id} ${state ? 'ON' : 'OFF'} failed. Will retry.`)
         await timeout(5000);
@@ -168,7 +186,7 @@ export default class WifiOutLets {
       }
 
       if (tries > 5) {
-        logger.ERROR(`Previous ${tries} attempts to turn ${id} ${state ? 'ON' : 'OFF'} failed.`)
+        logger.error(`Previous ${tries} attempts to turn ${id} ${state ? 'ON' : 'OFF'} failed.`)
       }
 
       if (response === true) {
