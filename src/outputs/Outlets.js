@@ -114,6 +114,10 @@ export default class WifiOutLets {
     try {
       let status = await this.tuya.get({schema: true});
 
+      if (!status.devId) {
+        throw new Error('Received bad data from tuya');
+      }
+
       Object.keys(status.dps).forEach(dps => {
         if (this.reverseOutletMap[dps]) {
           newState[this.reverseOutletMap[dps]].state = status.dps[dps];
@@ -132,6 +136,9 @@ export default class WifiOutLets {
     let status;
     try {
       status = await this.tuya.get({schema: true});
+      if (!status.devId) {
+        throw new Error('Received bad data from tuya');
+      }
     } catch (ex) {
       logger.error('Unable to check for bad states')
     }
