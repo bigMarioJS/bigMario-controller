@@ -136,6 +136,8 @@ export default class WifiOutLets {
       logger.error('Unable to check for bad states')
     }
 
+    console.log('checked for bad states got', status)
+
     let results = {};
 
     Object.keys(status.dps).forEach(dps => {
