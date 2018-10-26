@@ -31,30 +31,9 @@ export default class WifiOutLets {
     this.state = this.initState;
     this.reverseOutletMap = this.makeReverseOutLetMap();
     this.checkForBadStates = this.checkForBadStates.bind(this);
-    // this.startLoop = this.startLoop.bind(this);
     this.initSelfRepairLoop = this.initSelfRepairLoop.bind(this);
-
     this.getStatus = this.getStatus.bind(this);
-
     this.init = this.init.bind(this);
-
-
-    // this.checkState = this.checkState.bind(this)
-
-    // move out of constructor
-    // try {
-    //   this.tuya = new TuyaDevice({
-    //     id: config.tuyaLocalId,
-    //     key: config.tuyaLocalKey,
-    //     ip: config.tuyaLocalIpAddress
-    //   });
-    // } catch (ex) {
-    //   logger.error('BAD Tuya configuration', ex)
-    // }
-
-    // console.log('insdie ',this.tuya)
-
-    // this.updateState();
   }
 
   async init () {
@@ -176,29 +155,29 @@ export default class WifiOutLets {
 
     if ((this.state[id].state !== state && !this.state[id].requestingChange) || override) {
 
-      logger.info(`Turning ${id} ${state ? 'ON' : 'OFF'}`)
+      logger.info(`${override ? 'Self Repair: ' : ''}Turning ${id} ${state ? 'ON' : 'OFF'}`)
       this.state[id].requestingChange = true;
 
       let response = await this.toggleOutlet(id, state);
 
-      while (response != true && tries < 5) {
+      while (response !== true && tries < 6) {
         logger.warn(`Previous attempt (${tries}) to turn ${id} ${state ? 'ON' : 'OFF'} failed. Will retry.`)
-        await timeout(7000);
+        await timeout(5000);
         response = await this.toggleOutlet(id, state);
         tries++
       }
 
       if (tries > 5) {
         logger.ERROR(`Previous ${tries} attempts to turn ${id} ${state ? 'ON' : 'OFF'} failed.`)
-        //TODO Alert
       }
 
       if (response === true) {
         this.state[id].state = state;
         this.state[id].requestingChange = false;
+        logger.info(`Turning ${id} ${state ? 'ON' : 'OFF'} was a success`)
       }
 
-      this.updateState();
+      // this.updateState();
 
       return response;
     }

@@ -31,8 +31,6 @@ export default class Board {
         controller: "HTU21D"
       });
 
-
-      console.log('---->', sensorData)
       sensor.on("change", function() {
         sensorData.setData({
           relativeHumidityOne: this.hygrometer.relativeHumidity,

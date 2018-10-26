@@ -115,20 +115,6 @@ const init = async () => {
     initialized = true;
     logger.info('Initialization complete')
 
-
-    // while(!initialized.board && !initialized.sensor && !intialized.outlets) {
-      // console.log('inputs and out puts inited')
-
-      //init all loops
-
-      //start outlet self repair loop
-
-
-      // init send data loop
-
-    // }
-  }
-  //setInterval(sendDataLoop, config.myceliumApiUpdateSeconds);
-
+}
 
 init().catch(()=> {})
