@@ -169,14 +169,19 @@ export default class WifiOutLets {
 
   async turn (id, state, override) {
     let tries = 1;
+    let response;
 
     if ((this.state[id].state !== state && !this.state[id].requestingChange) || override) {
 
       logger.info(`${override ? 'Self Repair: ' : ''}Turning ${id} ${state ? 'ON' : 'OFF'}`)
       this.state[id].requestingChange = true;
 
-      let response = await this.toggleOutlet(id, state);
-
+      try {
+        response = await this.toggleOutlet(id, state);
+      } catch (ex) {
+        logger.warn(`Failed to turn ${id} to ${state ? 'ON' : 'OFF'}`)
+        response = false;
+      }
 
       while (response !== true && tries < 6) {
         logger.warn(`Previous attempt (${tries}) to turn ${id} ${state ? 'ON' : 'OFF'} failed. Will retry.`)

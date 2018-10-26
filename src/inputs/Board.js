@@ -16,7 +16,7 @@ export default class Board {
   async init () {
     let sensorData = this.sensorData
 
-    let boardInited;
+    let boardInited, sensorInited;
 
     this.board = new five.Board({
       repl: false,
@@ -41,7 +41,7 @@ export default class Board {
 
     while (!boardInited & !this.sensorData) {
       await timeout(2000);
-      if (boardInited & this.sensorData) {
+      if (boardInited & sensorInited) {
         logger.info('Board fully intializing.')
         return true;
       }
