@@ -48,14 +48,10 @@ export default class Board {
 
     this.listener();
 
-    console.log(this.board)
-
     while (!this.sensorReady) {
       await timeout(1000)
     }
-
     return true
-
   }
 
   listener() {
@@ -77,12 +73,10 @@ export default class Board {
       try {
         parsedJson = JSON.parse(data)
       } catch {
-        console.log('bad data')
         parsedJson = null;
       }
 
       if (parsedJson) {
-        console.log('-------', parsedJson)
         this.sensorReady = true;
         this.sensorData.setData({
           relativeHumidityOne: parsedJson.readings.relativeHumidity,
