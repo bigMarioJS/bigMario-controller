@@ -30,7 +30,11 @@ export default class Board {
         logger.error('Cannot get system serial ports, board init failed')
       }
 
-      let arduinoPort = allSerialPorts.filter(port => port.manufacturer === 'Arduino LLC')
+      let arduinoPort = allSerialPorts.filter(port => {
+        if (port.manufacturer) {
+         return port.manufacturer.toLowerCase().includes('arduino')
+        }
+      })
 
       if (arduinoPort.length === 0) {
         logger.error('Arduino board not connected')
