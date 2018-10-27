@@ -47,80 +47,80 @@ export default class HumdityLoop {
   }
 
   // time based loop (broken sensor :-())
-  async init() {
-    while (true) {
-      let inputTime = 30000
-      let waitBetweenCalls = 5000;
+  // async init() {
+  //   while (true) {
+  //     let inputTime = 30000
+  //     let waitBetweenCalls = 5000;
 
-        this.setCycleTime(inputTime + waitBetweenCalls + waitBetweenCalls);
+  //       this.setCycleTime(inputTime + waitBetweenCalls + waitBetweenCalls);
 
-        logger.info(`Cycle Humidifer ON for ${this.getCycleTimeInSeconds()}`);
+  //       logger.info(`Cycle Humidifer ON for ${this.getCycleTimeInSeconds()}`);
 
-        await this.outlets.turn(outletNames.humidifierFan, true);
-        await timeout(waitBetweenCalls);
-        await this.outlets.turn(outletNames.humidifier, true);
-        await timeout(inputTime);
-        await this.outlets.turn(outletNames.humidifier, false);
-        await timeout(waitBetweenCalls);
-        await this.outlets.turn(outletNames.humidifierFan, false);
+  //       await this.outlets.turn(outletNames.humidifierFan, true);
+  //       await timeout(waitBetweenCalls);
+  //       await this.outlets.turn(outletNames.humidifier, true);
+  //       await timeout(inputTime);
+  //       await this.outlets.turn(outletNames.humidifier, false);
+  //       await timeout(waitBetweenCalls);
+  //       await this.outlets.turn(outletNames.humidifierFan, false);
 
-        this.setCycleTime(180000);
-        logger.info(`Humidity cycle hold for ${this.getCycleTimeInSeconds()} seconds`);
-        await timeout(this.getCycleTime());
-      }
-    }
+  //       this.setCycleTime(180000);
+  //       logger.info(`Humidity cycle hold for ${this.getCycleTimeInSeconds()} seconds`);
+  //       await timeout(this.getCycleTime());
+  //     }
+  //   }
 
 
   // pid loop
-  // async init() {
-  //   while (true) {
-  //     let humidity = parseFloat(this.sensorData.getHumidity());
+  async init() {
+    while (true) {
+      let humidity = parseFloat(this.sensorData.getHumidity());
 
-  //     if (!isNaN(this.sensorData.getHumidity())) {
-  //       let pidInput = this.ctr.update(humidity);
+      if (!isNaN(this.sensorData.getHumidity())) {
+        let pidInput = this.ctr.update(humidity);
 
-  //       let inputTime = Math.abs((parseInt(pidInput) * 1000) + 20000);
+        let inputTime = Math.abs((parseInt(pidInput) * 1000) + 20000);
 
-  //       if (pidInput > 0) {
-  //         let waitBetweenCalls = 5000;
+        if (pidInput > 0) {
+          let waitBetweenCalls = 5000;
 
-  //         this.setCycleTime(inputTime + waitBetweenCalls + waitBetweenCalls);
+          this.setCycleTime(inputTime + waitBetweenCalls + waitBetweenCalls);
 
-  //         logger.info(`Humidity ${humidity} too low. Cycle Humidifer ON for ${this.getCycleTimeInSeconds()}`);
+          logger.info(`Humidity ${humidity} too low. Cycle Humidifer ON for ${this.getCycleTimeInSeconds()}`);
 
-  //         await this.outlets.turn(outletNames.humidifierFan, true);
-  //         await timeout(waitBetweenCalls);
-  //         await this.outlets.turn(outletNames.humidifier, true);
-  //         await timeout(inputTime);
-  //         await this.outlets.turn(outletNames.humidifier, false);
-  //         await timeout(waitBetweenCalls);
-  //         await this.outlets.turn(outletNames.humidifierFan, false);
+          await this.outlets.turn(outletNames.humidifierFan, true);
+          await timeout(waitBetweenCalls);
+          await this.outlets.turn(outletNames.humidifier, true);
+          await timeout(inputTime);
+          await this.outlets.turn(outletNames.humidifier, false);
+          await timeout(waitBetweenCalls);
+          await this.outlets.turn(outletNames.humidifierFan, false);
 
-  //         this.setCycleTime(60000);
-  //         logger.info(`Humidity cycle hold for ${this.getCycleTimeInSeconds()} seconds`);
-  //         await timeout(this.getCycleTime());
-  //       }
+          this.setCycleTime(60000);
+          logger.info(`Humidity cycle hold for ${this.getCycleTimeInSeconds()} seconds`);
+          await timeout(this.getCycleTime());
+        }
 
-  //       if (pidInput <= 0 && !this.growProfile.useFanToLower) {
-  //         this.setCycleTime(120000);
-  //         logger.info(`Humidity too high, hold for ${this.getCycleTimeInSeconds()} seconds`);
-  //         await timeout(this.getCycleTime());
-  //       }
+        if (pidInput <= 0 && !this.growProfile.useFanToLower) {
+          this.setCycleTime(120000);
+          logger.info(`Humidity too high, hold for ${this.getCycleTimeInSeconds()} seconds`);
+          await timeout(this.getCycleTime());
+        }
 
-  //       if (pidInput < 0 && this.growProfile.useFanToLower) {
-  //         this.setCycleTime(120000);
-  //         logger.info(`Humidity too high. Cycle Humidity Fan ON for ${this.getCycleTimeInSeconds()} seconds`);
-  //         await this.outlets.turn(outletNames.humidifier, false)
-  //         await this.outlets.turn(outletNames.humidifierFan, true)
-  //         await timeout(this.getCycleTime());
+        if (pidInput < 0 && this.growProfile.useFanToLower) {
+          this.setCycleTime(120000);
+          logger.info(`Humidity too high. Cycle Humidity Fan ON for ${this.getCycleTimeInSeconds()} seconds`);
+          await this.outlets.turn(outletNames.humidifier, false)
+          await this.outlets.turn(outletNames.humidifierFan, true)
+          await timeout(this.getCycleTime());
 
-  //         this.setCycleTime(60000);
-  //         logger.info(`Humidity cycle hold for ${this.getCycleTimeInSeconds()} seconds`);
-  //         await timeout(this.getCycleTime());
-  //       }
-  //     } else {
-  //       await timeout(10000)
-  //     }
-  //   }
-  // }
+          this.setCycleTime(60000);
+          logger.info(`Humidity cycle hold for ${this.getCycleTimeInSeconds()} seconds`);
+          await timeout(this.getCycleTime());
+        }
+      } else {
+        await timeout(10000)
+      }
+    }
+  }
 }
