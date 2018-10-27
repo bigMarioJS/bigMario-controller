@@ -65,7 +65,7 @@ export default class HeatLoop {
           expect = 'LESS';
         }
 
-        if (utils.expectResults(this.sensorData.getTemp(), expect, temp)) {
+        if (utils.checkResults(this.sensorData.getTemp(), expect, temp)) {
           logger.warn(`Last Heat cycle for ${this.getCycleTimeInSeconds()} seconds did not produce results`);
           cyclesWithNoResults++;
         } else {

@@ -1,9 +1,5 @@
-import { outletNames } from '../const'
-
 import Logger from './Logger';
 const logger = new Logger();
-
-
 
 export const checkResults = (currentReading, toBe, previousReading) => {
 
