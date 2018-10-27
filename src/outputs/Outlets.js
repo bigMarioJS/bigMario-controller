@@ -87,24 +87,24 @@ export default class WifiOutLets {
 
     while (true) {
 
-      let badStates = await this.checkForBadStates()
-      checks++
+      let badStates = await this.checkForBadStates();
+      checks++;
 
       if (checks > 10) {
-        logger.info(`Self repair has checked for bad states ${checks} times since last report`)
+        logger.info(`Self repair has checked for bad states ${checks} times since last report`);
         checks = 1;
       }
 
 
       for (let key in badStates) {
-        logger.warn(`Bad outlet state found. Expected ${key} to be ${badStates[key] ? 'ON' : 'OFF'}`)
+        logger.warn(`Bad outlet state found. Expected ${key} to be ${badStates[key] ? 'ON' : 'OFF'}`);
         try {
-          await this.turn(key, badStates[key], true)
+          await this.turn(key, badStates[key], true);
         } catch (ex) {
-          logger.error(`Unable to recover ${key} from bad state`)
+          logger.error(`Unable to recover ${key} from bad state`);
         }
       }
-      await timeout(10000)
+      await timeout(10000);
     }
   }
 
@@ -146,6 +146,7 @@ export default class WifiOutLets {
     } catch (ex) {
       logger.error('Unable to get states from Tuya', ex)
     }
+
     this.state = newState;
     return newState;
   }
@@ -153,25 +154,35 @@ export default class WifiOutLets {
   async checkForBadStates() {
     let status;
     let statusIsOK
+    let tries = 1;
 
     while (!statusIsOK) {
+
+      if (status === false) {
+        logger.error(`Attemting to check for bad states try ${tries} `);
+      }
+
+      tries++;
 
       try {
         status = await this.tuya.get({schema: true});
 
-        if (status && status.devId) {
+        if (status && status.devId && status.dps) {
           statusIsOK = true;
         } else {
+          statusIsOK = fase;
           logger.error(`Got bad data when tried to fetch tuya's states`)
         }
 
       } catch (ex) {
-        logger.error(`Unable get tuya's states`)
+        statusIsOK = false;
+        logger.error(`Unable get tuya's states`, ex)
       }
+
       await timeout(2000)
     }
 
-    logger.silly(`Got bad data sucessfully`)
+    logger.silly(`Check for bad states sucessful`)
 
   let results = {};
 
@@ -223,16 +234,16 @@ async turn(id, state, override) {
       response = false;
     }
 
-    while (response !== true && tries < 6) {
+    while (response !== true) {
       logger.warn(`Previous attempt (${tries}) to turn ${id} ${state ? 'ON' : 'OFF'} failed. Will retry.`)
       await timeout(5000);
       response = await this.toggleOutlet(id, state);
       tries++
     }
 
-    if (tries > 5) {
-      logger.error(`Previous ${tries} attempts to turn ${id} ${state ? 'ON' : 'OFF'} failed.`)
-    }
+    // if (tries > 5) {
+    //   logger.error(`Previous ${tries} attempts to turn ${id} ${state ? 'ON' : 'OFF'} failed.`)
+    // }
 
     if (response === true) {
       this.state[id].state = state;
