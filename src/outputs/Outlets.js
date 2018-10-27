@@ -1,5 +1,7 @@
 import TuyaDevice from 'tuyapi';
-import { outletNames } from '../const';
+import {
+  outletNames
+} from '../const';
 import Logger from '../utils/Logger'
 
 
@@ -8,7 +10,7 @@ const logger = new Logger();
 const timeout = ms => new Promise(res => setTimeout(res, ms))
 
 export default class WifiOutLets {
-  constructor (config) {
+  constructor(config) {
 
     // TODO: move to config
     this.outletMap = {
@@ -39,7 +41,7 @@ export default class WifiOutLets {
     this.updateState = this.updateState.bind(this)
   }
 
-  async init () {
+  async init() {
 
     try {
       this.tuya = await this.initOutlets()
@@ -49,7 +51,10 @@ export default class WifiOutLets {
     }
 
     try {
-      await this.tuya.set({set: 0, dps: this.outletMap[outletNames.all]})
+      await this.tuya.set({
+        set: 0,
+        dps: this.outletMap[outletNames.all]
+      })
     } catch (ex) {
       logger.error('Unable to set all outlets to OFF', ex)
       return false;
@@ -68,7 +73,7 @@ export default class WifiOutLets {
 
   }
 
-  async initOutlets () {
+  async initOutlets() {
     return new TuyaDevice({
       id: this.config.tuyaLocalId,
       key: this.config.tuyaLocalKey,
@@ -76,31 +81,32 @@ export default class WifiOutLets {
     });
   }
 
- async initSelfRepairLoop () {
-   logger.info('Starting outlet self repair loop')
-   let checks = 0;
+  async initSelfRepairLoop() {
+    logger.info('Starting outlet self repair loop')
+    let checks = 1;
 
-   while (true) {
-    let badStates = await this.checkForBadStates()
-    checks++
+    while (true) {
 
-    if (checks > 10) {
-      logger.info(`Self repair has checked for bad states ${checks} times since last report`)
-      checks = 0;
-    }
+      let badStates = await this.checkForBadStates()
+      checks++
+
+      if (checks > 10) {
+        logger.info(`Self repair has checked for bad states ${checks} times since last report`)
+        checks = 1;
+      }
 
 
-      for (let key in badStates ) {
+      for (let key in badStates) {
         logger.warn(`Bad outlet state found. Expected ${key} to be ${badStates[key] ? 'ON' : 'OFF'}`)
         try {
           await this.turn(key, badStates[key], true)
         } catch (ex) {
           logger.error(`Unable to recover ${key} from bad state`)
         }
+      }
+      await timeout(10000)
     }
-    await timeout(10000)
   }
-}
 
   getStatus() {
     let results = {};
@@ -110,7 +116,7 @@ export default class WifiOutLets {
     return results;
   }
 
-  makeReverseOutLetMap () {
+  makeReverseOutLetMap() {
     let map = {};
     Object.keys(this.outletMap).map(key => {
       map[this.outletMap[key]] = key;
@@ -118,14 +124,16 @@ export default class WifiOutLets {
     return map;
   }
 
-  async updateState () {
+  async updateState() {
     let newState = Object.assign({}, this.initState);
 
     try {
-      let status = await this.tuya.get({schema: true});
+      let status = await this.tuya.get({
+        schema: true
+      });
 
       if (!status.devId) {
-        throw new Error('Received bad data from tuya');
+        logger.error('Received bad data from tuyu', ex)
       }
 
       Object.keys(status.dps).forEach(dps => {
@@ -142,95 +150,113 @@ export default class WifiOutLets {
     return newState;
   }
 
-  async checkForBadStates () {
+  async checkForBadStates() {
     let status;
-    try {
-      status = await this.tuya.get({schema: true});
-      if (!status.devId) {
-        throw new Error('Received bad data from tuya');
-      }
-    } catch (ex) {
-      logger.error('Unable to check for bad states')
-    }
+    let statusIsOK
 
-    let results = {};
-
-    Object.keys(status.dps).forEach(dps => {
-      if (this.reverseOutletMap[dps]) {
-        if (this.getOutletByDps(dps).state != status.dps[dps] && !this.getOutletByDps(dps).requestingChange ) {
-          results[this.getOutletNameByDps(dps)] = this.state[this.getOutletNameByDps(dps)].state
-        }
-      }
-    })
-    return results;
-  }
-
-  getOutletNameByDps(dps) {
-    return this.reverseOutletMap[dps];
-  }
-
-  getOutletByDps(dps) {
-    return this.state[this.getOutletNameByDps(dps)];
-  }
-
-  async allOff () {
-    let results;
-    logger.info(`Turning ALL outlets OFF`)
-    try {
-      results = await this.tuya.set({set: 0, dps: this.outletMap[outletNames.all]})
-    } catch (ex) {
-      logger.error('Unable to turn all devices off', ex)
-    }
-    return results;
-  }
-
-  async turn (id, state, override) {
-    let tries = 1;
-    let response;
-
-    if ((this.state[id].state !== state && !this.state[id].requestingChange) || override) {
-
-      logger.info(`${override ? 'Self Repair: ' : ''}Turning ${id} ${state ? 'ON' : 'OFF'}`)
-      this.state[id].requestingChange = true;
+    while (!statusIsOK) {
 
       try {
-        response = await this.toggleOutlet(id, state);
+        status = await this.tuya.get({schema: true});
+
+        if (status && status.devId) {
+          statusIsOK = true;
+        } else {
+          logger.error(`Got bad data when tried to fetch tuya's states`)
+        }
+
       } catch (ex) {
-        logger.warn(`Failed to turn ${id} to ${state ? 'ON' : 'OFF'}`)
-        response = false;
+        logger.error(`Unable get tuya's states`)
       }
-
-      while (response !== true && tries < 6) {
-        logger.warn(`Previous attempt (${tries}) to turn ${id} ${state ? 'ON' : 'OFF'} failed. Will retry.`)
-        await timeout(5000);
-        response = await this.toggleOutlet(id, state);
-        tries++
-      }
-
-      if (tries > 5) {
-        logger.error(`Previous ${tries} attempts to turn ${id} ${state ? 'ON' : 'OFF'} failed.`)
-      }
-
-      if (response === true) {
-        this.state[id].state = state;
-        this.state[id].requestingChange = false;
-        logger.info(`Turning ${id} ${state ? 'ON' : 'OFF'} was a success`)
-      }
-
-      // this.updateState();
-
-      return response;
+      await timeout(2000)
     }
-  }
 
-  async toggleOutlet (id, state) {
+    logger.silly(`Got bad data sucessfully`)
+
+  let results = {};
+
+  Object.keys(status.dps).forEach(dps => {
+    if (this.reverseOutletMap[dps]) {
+      if (this.getOutletByDps(dps).state != status.dps[dps] && !this.getOutletByDps(dps).requestingChange) {
+        results[this.getOutletNameByDps(dps)] = this.state[this.getOutletNameByDps(dps)].state
+      }
+    }
+  })
+  return results;
+}
+
+getOutletNameByDps(dps) {
+  return this.reverseOutletMap[dps];
+}
+
+getOutletByDps(dps) {
+  return this.state[this.getOutletNameByDps(dps)];
+}
+
+async allOff() {
+  let results;
+  logger.info(`Turning ALL outlets OFF`)
+  try {
+    results = await this.tuya.set({
+      set: 0,
+      dps: this.outletMap[outletNames.all]
+    })
+  } catch (ex) {
+    logger.error('Unable to turn all devices off', ex)
+  }
+  return results;
+}
+
+async turn(id, state, override) {
+  let tries = 1;
+  let response;
+
+  if ((this.state[id].state !== state && !this.state[id].requestingChange) || override) {
+
+    logger.info(`${override ? 'Self Repair: ' : ''}Turning ${id} ${state ? 'ON' : 'OFF'}`)
+    this.state[id].requestingChange = true;
+
     try {
-      let response = await this.tuya.set({set: state, dps: this.outletMap[id]});
-      return response;
+      response = await this.toggleOutlet(id, state);
     } catch (ex) {
-      logger.error(`Unable to turn ${id} ${state ? 'ON' : 'OFF'}`, ex)
-      return !state;
+      logger.warn(`Failed to turn ${id} to ${state ? 'ON' : 'OFF'}`)
+      response = false;
     }
+
+    while (response !== true && tries < 6) {
+      logger.warn(`Previous attempt (${tries}) to turn ${id} ${state ? 'ON' : 'OFF'} failed. Will retry.`)
+      await timeout(5000);
+      response = await this.toggleOutlet(id, state);
+      tries++
+    }
+
+    if (tries > 5) {
+      logger.error(`Previous ${tries} attempts to turn ${id} ${state ? 'ON' : 'OFF'} failed.`)
+    }
+
+    if (response === true) {
+      this.state[id].state = state;
+      this.state[id].requestingChange = false;
+      logger.info(`Turning ${id} ${state ? 'ON' : 'OFF'} was a success`)
+    }
+
+    // this.updateState();
+
+    return response;
   }
+}
+
+async toggleOutlet(id, state) {
+  try {
+    let response = await this.tuya.set({
+      set: state,
+      dps: this.outletMap[id]
+    });
+    return response;
+  } catch (ex) {
+    logger.error(`Unable to turn ${id} ${state ? 'ON' : 'OFF'}`, ex)
+    return !state;
+  }
+}
 
 }
