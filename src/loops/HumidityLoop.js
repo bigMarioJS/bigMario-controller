@@ -73,7 +73,7 @@ export default class HumdityLoop {
 
   // pid loop
   async init() {
-    while (true) {
+    while (true && this.growProfile.relativeHumidity.usePID) {
       let humidity = parseFloat(this.sensorData.getHumidity());
 
       if (!isNaN(this.sensorData.getHumidity())) {
