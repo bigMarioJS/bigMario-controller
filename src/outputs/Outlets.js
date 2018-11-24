@@ -126,11 +126,12 @@ export default class WifiOutLets {
 
   async updateState() {
     let newState = Object.assign({}, this.initState);
-    let status
+    let status;
+    let success;
 
     logger.info('Updating state')
 
-    while ((status & !status.devId) || !status) {
+    while (!success) {
       try {
         status = await this.tuya.get({
           schema: true
@@ -145,6 +146,7 @@ export default class WifiOutLets {
           if (this.reverseOutletMap[dps]) {
             newState[this.reverseOutletMap[dps]].state = status.dps[dps];
             newState[this.reverseOutletMap[dps]].requestingChange = false;
+            success = true;
           }
         })
         logger.silly(`New state: ${JSON.stringify(newState)}`)
