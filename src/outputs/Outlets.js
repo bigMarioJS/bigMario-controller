@@ -130,7 +130,7 @@ export default class WifiOutLets {
 
     logger.info('Updating state')
 
-    while (!status & !status.devId) {
+    while ((status & !status.devId) || !status) {
       try {
         status = await this.tuya.get({
           schema: true
