@@ -138,6 +138,7 @@ export default class WifiOutLets {
 
         if (status & !status.devId) {
           logger.error('Received bad data from tuyu received:', status)
+          throw error
         }
 
         Object.keys(status.dps).forEach(dps => {
