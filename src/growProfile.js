@@ -24,24 +24,24 @@ export default {
     },
     {
       cron: '0 * * * *',
-      runTimeSeconds: 120,
+      runTimeSeconds: 60,
       outlet: 'HUMIDIFER_OUTLET'
     },
     {
       cron: '0 * * * *',
-      runTimeSeconds: 120,
+      runTimeSeconds: 60,
       outlet: 'HUMIDIFER_FAN_OUTLET'
     },
-    {
-      cron: '30 * * * *',
-      runTimeSeconds: 120,
-      outlet: 'HUMIDIFER_OUTLET'
-    },
-    {
-      cron: '30 * * * *',
-      runTimeSeconds: 120,
-      outlet: 'HUMIDIFER_FAN_OUTLET'
-    }
+    // {
+    //   cron: '30 * * * *',
+    //   runTimeSeconds: 60,
+    //   outlet: 'HUMIDIFER_OUTLET'
+    // },
+    // {
+    //   cron: '30 * * * *',
+    //   runTimeSeconds: 120,
+    //   outlet: 'HUMIDIFER_FAN_OUTLET'
+    // }
   ],
   temp: 24
 }
