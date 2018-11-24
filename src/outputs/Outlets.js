@@ -90,10 +90,10 @@ export default class WifiOutLets {
       let badStates = await this.checkForBadStates();
       checks++;
 
-      if (checks > 10) {
-        logger.info(`Self repair has checked for bad states ${checks} times since last report`);
-        checks = 1;
-      }
+      // if (checks > 9) {
+      //   logger.warn(`Self repair has checked for bad states ${checks} times since last report`);
+      //   checks = 1;
+      // }
 
 
       for (let key in badStates) {
@@ -126,27 +126,33 @@ export default class WifiOutLets {
 
   async updateState() {
     let newState = Object.assign({}, this.initState);
+    let status
 
-    try {
-      let status = await this.tuya.get({
-        schema: true
-      });
+    logger.info('Updating state')
 
-      if (!status.devId) {
-        logger.error('Received bad data from tuyu', ex)
-      }
+    while (!status & !status.devId) {
+      try {
+        status = await this.tuya.get({
+          schema: true
+        });
 
-      Object.keys(status.dps).forEach(dps => {
-        if (this.reverseOutletMap[dps]) {
-          newState[this.reverseOutletMap[dps]].state = status.dps[dps];
-          newState[this.reverseOutletMap[dps]].requestingChange = false;
+        if (!status.devId) {
+          logger.error('Received bad data from tuyu received:', status)
         }
-      })
-      logger.silly(`New state: ${JSON.stringify(newState)}`)
-    } catch (ex) {
-      logger.error('Unable to get states from Tuya', ex)
+
+        Object.keys(status.dps).forEach(dps => {
+          if (this.reverseOutletMap[dps]) {
+            newState[this.reverseOutletMap[dps]].state = status.dps[dps];
+            newState[this.reverseOutletMap[dps]].requestingChange = false;
+          }
+        })
+        logger.silly(`New state: ${JSON.stringify(newState)}`)
+      } catch (ex) {
+        logger.error('Unable to get states from Tuya', ex)
+      }
     }
 
+    logger.info('Updating state success')
     this.state = newState;
     return newState;
   }
@@ -251,7 +257,7 @@ async turn(id, state, override) {
       logger.info(`Turning ${id} ${state ? 'ON' : 'OFF'} was a success`)
     }
 
-    // this.updateState();
+    this.updateState();
 
     return response;
   }

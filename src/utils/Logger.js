@@ -35,7 +35,9 @@ export default class Logger {
   }
 
   silly (message) {
-    //console.log(`[${getTimeStamp()}] SILLY ${message}`)
+    console.log(`[${getTimeStamp()}] SILLY ${message}`)
+    logger.log('silly', stripAnsi(message));
+
   }
 
   info (message) {

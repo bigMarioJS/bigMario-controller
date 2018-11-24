@@ -46,32 +46,6 @@ export default class HumdityLoop {
     return parseInt((this.cycleTime - diff) / 1000)
   }
 
-  // time based loop (broken sensor :-())
-  // async init() {
-  //   while (true) {
-  //     let inputTime = 30000
-  //     let waitBetweenCalls = 5000;
-
-  //       this.setCycleTime(inputTime + waitBetweenCalls + waitBetweenCalls);
-
-  //       logger.info(`Cycle Humidifer ON for ${this.getCycleTimeInSeconds()}`);
-
-  //       await this.outlets.turn(outletNames.humidifierFan, true);
-  //       await timeout(waitBetweenCalls);
-  //       await this.outlets.turn(outletNames.humidifier, true);
-  //       await timeout(inputTime);
-  //       await this.outlets.turn(outletNames.humidifier, false);
-  //       await timeout(waitBetweenCalls);
-  //       await this.outlets.turn(outletNames.humidifierFan, false);
-
-  //       this.setCycleTime(180000);
-  //       logger.info(`Humidity cycle hold for ${this.getCycleTimeInSeconds()} seconds`);
-  //       await timeout(this.getCycleTime());
-  //     }
-  //   }
-
-
-  // pid loop
   async init() {
     while (true && this.growProfile.relativeHumidity.usePID) {
       let humidity = parseFloat(this.sensorData.getHumidity());
