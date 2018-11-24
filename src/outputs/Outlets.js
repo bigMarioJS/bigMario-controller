@@ -136,7 +136,7 @@ export default class WifiOutLets {
           schema: true
         });
 
-        if (!status.devId) {
+        if (status & !status.devId) {
           logger.error('Received bad data from tuyu received:', status)
         }
 
