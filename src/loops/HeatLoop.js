@@ -20,9 +20,9 @@ export default class HeatLoop {
     this.setCycleTime = this.setCycleTime.bind(this);
 
     this.ctr = new Controller({
-      k_p: 0.25,
-      k_i: 0.05,
-      k_d: 0.05
+      k_p: 0.20,
+      k_i: 0.01,
+      k_d: 0.01
     });
 
     this.ctr.setTarget(growProfile.temp);
