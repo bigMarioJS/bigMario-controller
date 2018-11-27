@@ -19,9 +19,11 @@ export default class HeatLoop {
     this.getCycleTime = this.getCycleTime.bind(this);
     this.setCycleTime = this.setCycleTime.bind(this);
 
+
+    // https://www.machinedesign.com/sensors/introduction-pid-control
     this.ctr = new Controller({
       k_p: 0.1,
-      k_i: 0.05,
+      k_i: 0.1,
       k_d: 0.01
     });
 
