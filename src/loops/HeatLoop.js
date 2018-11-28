@@ -22,8 +22,8 @@ export default class HeatLoop {
 
     // https://www.machinedesign.com/sensors/introduction-pid-control
     this.ctr = new Controller({
-      k_p: 0.1,
-      k_i: 0.1,
+      k_p: 0.08,
+      k_i: 0.15,
       k_d: 0.01
     });
 
@@ -56,6 +56,7 @@ export default class HeatLoop {
       let temp = parseFloat(this.sensorData.getTemp());
       if (!isNaN(temp)) {
         let input = this.ctr.update(temp);
+        logger.info(`PID input is ${input}`);
         this.setCycleTime(Math.abs(parseInt(input) * 1000) + 120000);
         if (input > 0) {
           logger.info(`Cycle heat ON cycle for ${this.getCycleTimeInSeconds()} seconds`);
