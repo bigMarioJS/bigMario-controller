@@ -7,6 +7,7 @@ const logger = new Logger();
 const timeout = ms => new Promise(res => setTimeout(res, ms))
 
 export default class HeatLoop {
+
   constructor(sensorData, growProfile, outlets) {
     this.sensorData = sensorData;
     this.growProfile = growProfile;
@@ -58,9 +59,10 @@ export default class HeatLoop {
         let input = this.ctr.update(temp);
         logger.info(`PID input is ${input}`);
         this.setCycleTime(Math.abs(parseInt(input) * 1000) + 120000);
+
         if (input > 0) {
           logger.info(`Cycle heat ON cycle for ${this.getCycleTimeInSeconds()} seconds`);
-          await this.outlets.turn(outletNames.heater, true)
+          await this.outlets.turn(outletNames.heater, false)
           expect = 'GREATER';
         } else {
           logger.info(`Cycle heat OFF for ${this.getCycleTimeInSeconds()} seconds`);

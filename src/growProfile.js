@@ -24,12 +24,12 @@ export default {
     },
     {
       cron: '0 * * * *',
-      runTimeSeconds: 60,
+      runTimeSeconds: 120,
       outlet: 'HUMIDIFER_OUTLET'
     },
     {
       cron: '0 * * * *',
-      runTimeSeconds: 60,
+      runTimeSeconds: 120,
       outlet: 'HUMIDIFER_FAN_OUTLET'
     },
     // {
