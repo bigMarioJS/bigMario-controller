@@ -62,7 +62,7 @@ export default class HeatLoop {
 
         if (input > 0) {
           logger.info(`Cycle heat ON cycle for ${this.getCycleTimeInSeconds()} seconds`);
-          await this.outlets.turn(outletNames.heater, false)
+          await this.outlets.turn(outletNames.heater, true)
           expect = 'GREATER';
         } else {
           logger.info(`Cycle heat OFF for ${this.getCycleTimeInSeconds()} seconds`);
