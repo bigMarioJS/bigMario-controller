@@ -9,17 +9,22 @@ export default {
   schedules: [
     {
       cron: '0 0 * * *',
-      runTimeSeconds: 60,
+      runTimeSeconds: 200,
       outlet: 'EXHAUST_FAN_OUTLET'
     },
     {
-      cron: '0 8 * * *',
-      runTimeSeconds: 60,
+      cron: '0 4 * * *',
+      runTimeSeconds: 200,
+      outlet: 'EXHAUST_FAN_OUTLET'
+    },
+    {
+      cron: '0 12 * * *',
+      runTimeSeconds: 200,
       outlet: 'EXHAUST_FAN_OUTLET'
     },
     {
       cron: '0 16 * * *',
-      runTimeSeconds: 60,
+      runTimeSeconds: 200,
       outlet: 'EXHAUST_FAN_OUTLET'
     },
     {
