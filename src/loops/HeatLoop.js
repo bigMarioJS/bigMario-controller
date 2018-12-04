@@ -24,8 +24,9 @@ export default class HeatLoop {
     // https://www.machinedesign.com/sensors/introduction-pid-control
     this.ctr = new Controller({
       k_p: 0.05,
-      k_i: 0.01,
-      k_d: 0.01
+      k_i: 0.1,
+      k_d: 0.0
+      1
     });
 
     this.ctr.setTarget(growProfile.temp);
