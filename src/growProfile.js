@@ -27,14 +27,18 @@ export default {
       runTimeSeconds: 200,
       outlet: 'EXHAUST_FAN_OUTLET'
     },
+
+
+
+
     {
       cron: '0 * * * *',
-      runTimeSeconds: 200,
+      runTimeSeconds: 400,
       outlet: 'HUMIDIFER_OUTLET'
     },
     {
       cron: '0 * * * *',
-      runTimeSeconds: 200,
+      runTimeSeconds: 400,
       outlet: 'HUMIDIFER_FAN_OUTLET'
     },
     // {
