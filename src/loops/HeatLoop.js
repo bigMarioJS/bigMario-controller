@@ -57,8 +57,11 @@ export default class HeatLoop {
       let temp = parseFloat(this.sensorData.getTemp());
       if (!isNaN(temp)) {
         let input = this.ctr.update(temp);
-        logger.info(`PID input is ${input}`);
-        this.setCycleTime(Math.abs(parseInt(input) * 1000) + 120000);
+        logger.info(`For temp ${temp} PID input is ${input}`);
+        let cycleTime = Math.abs(parseInt(input) * 1000)
+        cycleTime = cycleTime > 15000 ? cycleTime : 15000
+
+        this.setCycleTime(cycleTime);
 
         if (input > 0) {
           logger.info(`Cycle heat ON cycle for ${this.getCycleTimeInSeconds()} seconds`);
