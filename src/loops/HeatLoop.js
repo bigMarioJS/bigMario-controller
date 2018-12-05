@@ -58,8 +58,7 @@ export default class HeatLoop {
       if (!isNaN(temp)) {
         let input = this.ctr.update(temp);
         logger.info(`For temp ${temp} PID input is ${input}`);
-        let cycleTime = Math.abs(parseInt(input) * 1000)
-        cycleTime = cycleTime > 15000 ? cycleTime : 15000
+        let cycleTime = Math.abs(parseInt(input) * 1000) + 15000
 
         this.setCycleTime(cycleTime);
 
