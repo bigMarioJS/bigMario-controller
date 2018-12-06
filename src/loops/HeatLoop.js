@@ -23,7 +23,7 @@ export default class HeatLoop {
 
     // https://www.machinedesign.com/sensors/introduction-pid-control
     this.ctr = new Controller({
-      k_p: 0.2,
+      k_p: 0.8,
       k_i: 0.01,
       k_d: 0.01
     });
